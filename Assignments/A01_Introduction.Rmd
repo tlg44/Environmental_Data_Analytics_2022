@@ -1,6 +1,6 @@
 ---
 title: "Assignment 1: Introduction"
-author: "Student Name"
+author: Tasha Griffiths
 output: pdf_document
 geometry: margin=2.54cm
 ---
@@ -11,6 +11,7 @@ This exercise accompanies the introductory material in Environmental Data Analyt
 
 ## Directions
 1. Change "Student Name" on line 3 (above) with your name.
+2. why is this missing? 
 3. Work through the steps, **creating code and output** that fulfill each instruction.
 4. Be sure to **answer the questions** in this assignment document.
 6. When you have completed the assignment, **Knit** the text and code into a single PDF file.
@@ -22,21 +23,22 @@ The completed exercise is due on <>.
 
 1. What are your previous experiences with data analytics, R, and Git? Include both formal and informal training.
 
-> Answer: 
+> Answer: Essentially no experience. I have not taken any nicholas school courses that use R. However, I did complete the 1-week R bootcamp last summer.  
 
 2. Are there any components of the course about which you feel confident?
 
-> Answer: 
+> Answer: I have some professional experience translating data into helpful information for decision-makers, so I think the data visualization piece will be more straightforward.
 
 3. Are there any components of the course about which you feel apprehensive?
 
-> Answer: 
+> Answer: learning to code in R! I'm quite worried about learning all the new softwares, jargon, and correct syntax in a quick enough manner. 
 
 
 ## 2) GitHub
 
 Provide a link below to your forked course repository in GitHub. Make sure you have pulled all recent changes from the course repository  and that you have updated your course README file. 
 
-> Answer: 
+> Answer: https://github.com/tlg44/Environmental_Data_Analytics_2022.git
+
 
 
