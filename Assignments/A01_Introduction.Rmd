@@ -38,7 +38,7 @@ The completed exercise is due on <>.
 
 Provide a link below to your forked course repository in GitHub. Make sure you have pulled all recent changes from the course repository  and that you have updated your course README file. 
 
-> Answer: https://github.com/tlg44/Environmental_Data_Analytics_2022.git
+> Answer: <https://github.com/tlg44/Environmental_Data_Analytics_2022.git>
 
 
 
