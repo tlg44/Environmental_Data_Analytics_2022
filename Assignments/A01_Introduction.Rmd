@@ -11,7 +11,7 @@ This exercise accompanies the introductory material in Environmental Data Analyt
 
 ## Directions
 1. Change "Student Name" on line 3 (above) with your name.
-2. why is this missing? 
+2. why was this number missing? 
 3. Work through the steps, **creating code and output** that fulfill each instruction.
 4. Be sure to **answer the questions** in this assignment document.
 6. When you have completed the assignment, **Knit** the text and code into a single PDF file.
@@ -23,15 +23,15 @@ The completed exercise is due on <>.
 
 1. What are your previous experiences with data analytics, R, and Git? Include both formal and informal training.
 
-> Answer: Essentially no experience. I have not taken any nicholas school courses that use R. However, I did complete the 1-week R bootcamp last summer.  
+> Answer: Essentially no experience. I have not taken any nicholas school courses that use R. However, I did complete the 1-week R bootcamp last summer with Nick Eubank from Duke's SSRI.  
 
 2. Are there any components of the course about which you feel confident?
 
-> Answer: I have some professional experience translating data into helpful information for decision-makers, so I think the data visualization piece will be more straightforward.
+> Answer: I have some professional experience translating data into helpful information for decision-makers, so I think the data visualization piece will be more straightforward.I also have experience working in a large relational database with some very basic SQL. 
 
 3. Are there any components of the course about which you feel apprehensive?
 
-> Answer: learning to code in R! I'm quite worried about learning all the new softwares, jargon, and correct syntax in a quick enough manner. 
+> Answer: learning to code in R! I'm quite worried about learning all the new softwares, jargon, and correct syntax in a quick enough manner. I also ran into quite a few 'bugs' with this first assignment and had trouble getting RStudio to play well with Github.
 
 
 ## 2) GitHub
