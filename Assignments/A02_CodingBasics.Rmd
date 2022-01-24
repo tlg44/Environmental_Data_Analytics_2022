@@ -66,13 +66,13 @@ Test_Scores <- c(46, 71, 92, 100)
 Student_Passed <- c(FALSE, TRUE, TRUE, TRUE)
 #Vector-CLass is logic
 
-df_Student_Test1_Results <- as.data.frame(Student_First_Name)
-df_Student_Test1_Results <- cbind(Student_First_Name, Test_Scores, Student_Passed)
+df_Student_Test1_Results <- data.frame(Student_First_Name,Test_Scores, Student_Passed)
 df_Student_Test1_Results
-#creating dataframe from main value of name, then combining 3 other values to make columns 
+#creating dataframe from series of three vectors to make columns and then printing to visulize data
 
 row.names(df_Student_Test1_Results)
 is.data.frame(df_Student_Test1_Results)
+#confriming that dataframe creation worked
 
 ```
 
@@ -86,12 +86,15 @@ is.data.frame(df_Student_Test1_Results)
 
 ```{r}
 Is_Student_Passing <- function(x) {
-ifelse(x>50, Pass, Fail)
+ifelse(x>50, 'Pass', 'Fail')
 }
+#setting up a fuction named 'is student passing' where if any value of x is greater than 50, the student is passing. If less then 50 the 'else' says the student is failing. 
 
-Is_Student_Passing(df_Student_Test1_Results$Test_Scores )
+Is_Student_Passing(df_Student_Test1_Results$Test_Scores)
+#running the fuction with the x value replaced by the test scores column in the student test results dataframe
+
 ```
 
 12. QUESTION: Which option of `if` and `else` vs. `ifelse` worked? Why?
 
-> Answer: 
+> Answer: The ifelse worked because both the 'if' situation and the 'else' situation logic statements were incorporated. So 'if' the first statment is correct the fuction code would give out one result, if the code did not meet the logic statement (an 'else') a second result would be shown. 
