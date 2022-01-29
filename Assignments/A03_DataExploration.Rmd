@@ -205,7 +205,6 @@ ggplot(Litter) +
   geom_violin(aes(x = Litter$functionalGroup, y = Litter$dryMass), bins = 50) 
 
 
-
 ```
 
 Why is the boxplot a more effective visualization option than the violin plot in this case?
