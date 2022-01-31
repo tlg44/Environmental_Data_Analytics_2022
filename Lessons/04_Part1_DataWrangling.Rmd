@@ -63,20 +63,20 @@ vignette("dplyr")
 Filtering allows us to choose certain rows (observations) in our dataset.
 
 Here are the relevant commands used in the `filter` function. Add some notes to designate what these commands mean. 
-`==`
-`!=`
-`<`
+`==` #compare value to specific value
+`!=` #check if varialbes are different
+`<` less than
 `<=`
 `>`
-`>=`
-`&`
-`|`
+`>=` greater or equal
+`&` all should be true
+`|` one or other should be true
 
 ```{r}
 class(NTL.phys.data$lakeid)
 class(NTL.phys.data$depth)
 
-# matrix filtering
+# matrix filtering for only rows with zero on depth column
 NTL.phys.data.surface1 <- NTL.phys.data[NTL.phys.data$depth == 0,]
 
 # dplyr filtering
@@ -91,7 +91,7 @@ dim(NTL.phys.data.surface2)
 head(NTL.phys.data.surface3)
 dim(NTL.phys.data.surface3)
 
-# Choose multiple conditions to filter
+# Choose multiple conditions to filter (the | is an 'or' command) (%in% is way to filter for specific names) (all do the same thing)
 summary(NTL.phys.data$lakename)
 NTL.phys.data.PeterPaul1 <- filter(NTL.phys.data, lakename == "Paul Lake" | lakename == "Peter Lake")
 NTL.phys.data.PeterPaul2 <- filter(NTL.phys.data, lakename != "Central Long Lake" & 
@@ -100,7 +100,7 @@ NTL.phys.data.PeterPaul2 <- filter(NTL.phys.data, lakename != "Central Long Lake
                                      lakename != "Ward Lake" & lakename != "West Long Lake")
 NTL.phys.data.PeterPaul3 <- filter(NTL.phys.data, lakename %in% c("Paul Lake", "Peter Lake"))
 
-# Choose a range of conditions of a numeric or integer variable
+# Choose a range of conditions of a numeric or integer variable (use & so both conditions must be true) (all below do the same thing)
 summary(NTL.phys.data$daynum)
 NTL.phys.data.JunethruOctober1 <- filter(NTL.phys.data, daynum > 151 & daynum < 305)
 NTL.phys.data.JunethruOctober2 <- filter(NTL.phys.data, daynum > 151, daynum < 305)
@@ -119,7 +119,7 @@ class(NTL.phys.data$year4)
 ```
 Question: Why don't we filter using row numbers?
 
-> Answer: 
+> Answer: b/c row numbers can change when data is filtered/re-arranged. 
 
 ### Arrange
 
@@ -142,6 +142,8 @@ Selecting allows us to choose certain columns (variables) in our dataset.
 ```{r}
 NTL.phys.data.temps <- select(NTL.phys.data, lakename, sampledate:temperature_C)
 
+# use the : to say this column through this end column
+
 ```
 ### Mutate
 
@@ -150,6 +152,8 @@ Mutating allows us to add new columns that are functions of existing columns. Op
 ```{r}
 
 NTL.phys.data.temps <- mutate(NTL.phys.data.temps, temperature_F = (temperature_C*9/5) + 32)
+
+# after the comma is the name of the new column you are adding into the dataframe
 
 ```
 
@@ -164,7 +168,7 @@ NTL.phys.data.PeterPaul1 <- mutate(NTL.phys.data.PeterPaul1, month = month(sampl
 # reorder columns to put month with the rest of the date variables
 NTL.phys.data.PeterPaul1 <- select(NTL.phys.data.PeterPaul1, lakeid:daynum, month, sampledate:comments)
 
-# find out the start and end dates of the dataset
+# find out the start and end dates of the dataset (both of these do the same thing)
 interval(NTL.phys.data.PeterPaul1$sampledate[1], NTL.phys.data.PeterPaul1$sampledate[21613])
 interval(first(NTL.phys.data.PeterPaul1$sampledate), last(NTL.phys.data.PeterPaul1$sampledate))
 ```
@@ -177,6 +181,8 @@ Sometimes we will want to perform multiple functions on a single dataset on our 
 Let's say we want to take our raw dataset (NTL.phys.data), *then* filter the data for Peter and Paul lakes, *then* select temperature and observation information, and *then* add a column for temperature in Fahrenheit: 
 
 ```{r}
+
+#%>% is the same as 'then'
 NTL.phys.data.processed <- 
   NTL.phys.data %>%
   filter(lakename == "Paul Lake" | lakename == "Peter Lake") %>%
