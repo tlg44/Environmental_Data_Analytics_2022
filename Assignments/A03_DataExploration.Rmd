@@ -163,6 +163,8 @@ tail(Litter$collectDate) #used to see what the current year,month,date format is
 #Litter$collectDate <- as.Date(Litter$collectDate, format = "%Y/%m/%d")
 #class(Litter$collectDate) #conversion worked class is now a date but all data is N/A
 
+# Feb 1 class note: problem was the slashes in y / m/ d - should have been dashes so that it matches how the data is in the column already
+
 #install lubridate
 library(lubridate)
 
