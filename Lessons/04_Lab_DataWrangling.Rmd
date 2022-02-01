@@ -55,18 +55,24 @@ summary(NTL.phys.data$daynum)
 NTL.phys.data.JunethruOctober <- filter(NTL.phys.data, daynum %in% c(152:304))
 
 # Exercise 1: 
-# filter NTL.phys.data for the year 1999
+# filter NTL.phys.data for the year 1999 (should get 1898 rows)
 # what code do you need to use, based on the class of the variable?
-
+NTL.phys.data.1999 <- filter(NTL.phys.data, year4 %in% c("1999"))
+NTL.phys.data.1999 <- filter(NTL.phys.data, year4 == 1999)
 
 # Exercise 2: 
-# filter NTL.phys.data for Tuesday Lake from 1990 through 1999.
+# filter NTL.phys.data for Tuesday Lake from 1990 through 1999. (should get 1971 rows)
+NTL.phys.data.TuesdayLake.1990to1999 <- NTL.phys.data %>%
+  filter(lakename == "Tuesday Lake") %>%
+  filter (year4 %in% c(1990:1999))
+
+Exercise2 <- filter(NTL.phys.data, year4 %in% (1990:1999)) & lakename == 'TuesdayLake'
 
 
 ```
 Question: Why don't we filter using row numbers?
 
-> Answer: 
+> Answer: Row numbers are arbitrary - they don't always locate the sane data with the same number once things are filtered. 
 
 ## Pipes
 
@@ -83,11 +89,25 @@ NTL.phys.data.processed <-
 
 #Exercise 3: Using a pipe filter NTL.phys.data for Tuesday Lake from 1990 through 1999 only for July 
 
+#old code that didn't work gave our a timezone error
+#library(lubridate)
+#class (NTL.phys.data$sampledate)
+#NTL.phys.data$month <- month(NTL.phys.data$samledate)
 
-
+Exercise3 <- NTL.phys.data %>%
+  filter(year4 %in% 1990:1999) %>%
+  filter (lakename == 'Tuesday Lake') %>%
+  mutate (month =  month(sampledate)) %>%
+  filter (month == 7)
 
 
 #Exercise 4: Using the data from part 3, a pipe and the summarise() function find the mean surface temperature (hints: you will need to add another filter for depth==0). Make sure you eliminate NAs before computing the means
+
+Exercise4 <- Exercise3 %>%
+  filter(depth == 0) %>%
+  filter(!is.na(temperature_C)) %>%
+  summarise(mean = mean(temperature_C))
+
 
   
 ```
