@@ -161,7 +161,7 @@ tail(Litter$collectDate) #used to see what the current year,month,date format is
 #as.character(Litter$collectDate)
 #convert to date
 #Litter$collectDate <- as.Date(Litter$collectDate, format = "%Y/%m/%d")
-#class(Litter$collectDate) #conversion worked class is now a date
+#class(Litter$collectDate) #conversion worked class is now a date but all data is N/A
 
 #install lubridate
 library(lubridate)
