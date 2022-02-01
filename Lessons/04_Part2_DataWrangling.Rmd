@@ -68,7 +68,7 @@ NTL.phys.data.PeterPaul.subset <- select(NTL.phys.data.PeterPaul,
 NTL.nutrient.data.PeterPaul.subset <- select(NTL.nutrient.data.PeterPaul, 
                                              lakename, year4, daynum, month, sampledate, depth:po4)
 
-# write a more succinct line of code to subset the nutrient dataset. 
+# write a more succinct line of code to subset the nutrient dataset. (Use the : )
 
 ```
 
@@ -92,7 +92,7 @@ We will work with the new functions from `tidyr`. For gather we will use `pivot_
 NTL.nutrient.data.PeterPaul.gathered <- pivot_longer(NTL.nutrient.data.PeterPaul.subset,tn_ug:po4, names_to = "nutrient", values_to = "concentration")
 
 NTL.nutrient.data.PeterPaul.gathered <- subset(NTL.nutrient.data.PeterPaul.gathered, !is.na(concentration))
-count(NTL.nutrient.data.PeterPaul.gathered, nutrient)
+count(NTL.nutrient.data.PeterPaul.gathered$nutrient)
 
 write.csv(NTL.nutrient.data.PeterPaul.gathered, row.names = FALSE, 
           file = "./Data/Processed/NTL-LTER_Lake_Nutrients_PeterPaulGathered_Processed.csv")
