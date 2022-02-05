@@ -63,7 +63,7 @@ NTL.phys.data.1999 <- filter(NTL.phys.data, year4 == 1999)
 # Exercise 2: 
 # filter NTL.phys.data for Tuesday Lake from 1990 through 1999. (should get 1971 rows)
 NTL.phys.data.TuesdayLake.1990to1999 <- NTL.phys.data %>%
-  filter(lakename == "Tuesday Lake") %>%
+  filter(NTL.phys.data$lakename == "Tuesday Lake") %>%
   filter (year4 %in% c(1990:1999))
 
 Exercise2 <- filter(NTL.phys.data, year4 %in% (1990:1999)) & lakename == 'TuesdayLake'
@@ -105,7 +105,7 @@ Exercise3 <- NTL.phys.data %>%
 
 Exercise4 <- Exercise3 %>%
   filter(depth == 0) %>%
-  filter(!is.na(temperature_C)) %>%
+  filter(!is.na(temperature_C)) %>%    #alternatively: dropna(temeratureC)
   summarise(mean = mean(temperature_C))
 
 
@@ -119,8 +119,16 @@ For gather we will use `pivot_longer` and for spread we will use `pivot_wider`.
 ```{r}
 #Exercise 5: gather irradiance data (measured in the water column and measured on the deck of the sampling boat) into one column using pivot_longer
 
+exercise5 <- NTL.phys.data %>%
+  pivot_longer(cols = irradianceWater:irradianceDeck, 
+               names_to = "irradiance_type",
+               values_to = "irradiance")
 
 #Exercise 6: spread temperatureC into more than one column based on the depth
+
+exercise6 <- NTL.phys.data %>%
+  select(1:7) %>%
+  pivot_wider(names_from = depth, values_from = temperature_C)
 
 ```
 
