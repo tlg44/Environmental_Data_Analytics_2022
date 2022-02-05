@@ -25,8 +25,36 @@ The completed exercise is due on Monday, Feb 7 @ 7:00pm.
 
 ```{r, message = FALSE}
 #1
+getwd()
+setwd("C:/Users/Tasha Griffiths/Documents/Duke Year 1/Spring 22 Classes/Environmental Data Analytics/GithubRepos/Environmental_Data_Analytics_2022")
+
+#install.packages(tidyverse)
+library(tidyverse)
+#install.packages(lubridate)
+library(lubridate)
+#install.packages(dplyr)
+library(dplyr)
+
+#load all 4 raw data files
+EPAair_03_NC2018 <- read.csv("./Data/Raw/EPAair_O3_NC2018_raw.csv", 
+                             stringsAsFactors = TRUE)
+EPAair_03_NC2019 <- read.csv("./Data/Raw/EPAair_O3_NC2019_raw.csv", 
+                             stringsAsFactors = TRUE)
+EPAair_PM25_NC2018 <- read.csv("./Data/Raw/EPAair_PM25_NC2018_raw.csv", 
+                               stringsAsFactors = TRUE)
+EPAair_PM25_NC2019 <- read.csv("./Data/Raw/EPAair_PM25_NC2019_raw.csv", 
+                               stringsAsFactors = TRUE)
 
 #2
+#basic exploration, repeat for all datasets
+colnames(EPAair_03_NC2018)
+head(EPAair_03_NC2018)
+summary(EPAair_03_NC2018)
+str(EPAair_03_NC2018)
+dim(EPAair_03_NC2018)
+
+
+
 ```
 
 ## Wrangle individual datasets to create processed files.
@@ -37,13 +65,45 @@ The completed exercise is due on Monday, Feb 7 @ 7:00pm.
 
 ```{r}
 #3
+class(EPAair_03_NC2018$Date)
+class(EPAair_03_NC2019$Date)
+class(EPAair_PM25_NC2018$Date)
+class(EPAair_PM25_NC2019$Date)
 
-#4
+#Format all data file date columns as date
+EPAair_03_NC2018$Date <- as.Date(EPAair_03_NC2018$Date, format = "%m/%d/%Y")
+EPAair_03_NC2019$Date <- as.Date(EPAair_03_NC2019$Date, format = "%m/%d/%Y")
+EPAair_PM25_NC2018$Date <- as.Date(EPAair_PM25_NC2018$Date, format = "%m/%d/%Y")
+EPAair_PM25_NC2019$Date <- as.Date(EPAair_PM25_NC2019$Date, format = "%m/%d/%Y")
 
-#5
+
+#4 select a subset of columns
+EPAair_03_NC2018 <- select(EPAair_03_NC2018, Date, DAILY_AQI_VALUE, Site.Name, 
+                           AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, 
+                           SITE_LONGITUDE)
+
+EPAair_03_NC2019 <- select(EPAair_03_NC2019, Date, DAILY_AQI_VALUE, Site.Name, 
+                           AQS_PARAMETER_DESC, COUNTY, SITE_LATITUDE, 
+                           SITE_LONGITUDE)
+
+EPAair_PM25_NC2018 <- select(EPAair_PM25_NC2018, Date, DAILY_AQI_VALUE, 
+                             Site.Name, AQS_PARAMETER_DESC, COUNTY, 
+                             SITE_LATITUDE, SITE_LONGITUDE)
+
+EPAair_PM25_NC2019 <- select(EPAair_PM25_NC2019, Date, DAILY_AQI_VALUE, 
+                             Site.Name, AQS_PARAMETER_DESC, COUNTY, 
+                             SITE_LATITUDE, SITE_LONGITUDE)
+
+#5 fill cells in MP25 data sets
+EPAair_PM25_NC2018 <- mutate(EPAair_PM25_NC2018, AQS_PARAMETER_DESC, PM2.5)
+
+EPAair_PM25_NC2018<- EPAair_PM25_NC2018 %>%
+  pivot_longer(cols = AQS_PARAMETER_DESC, values_to = "PM2.5")
+
 
 #6
-
+write.csv(NTL.nutrient.data.PeterPaul, row.names = FALSE, 
+          file = "./Data/Processed/NTL-LTER_Lake_Nutrients_PeterPaul_Processed.csv")
 ```
 
 
