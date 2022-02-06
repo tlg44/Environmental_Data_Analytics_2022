@@ -64,7 +64,7 @@ dim(EPAair_03_NC2018)
 6. Save all four processed datasets in the Processed folder. Use the same file names as the raw files but replace "raw" with "processed".
 
 ```{r}
-#3
+#3 check data class 
 class(EPAair_03_NC2018$Date)
 class(EPAair_03_NC2019$Date)
 class(EPAair_PM25_NC2018$Date)
@@ -95,15 +95,26 @@ EPAair_PM25_NC2019 <- select(EPAair_PM25_NC2019, Date, DAILY_AQI_VALUE,
                              SITE_LATITUDE, SITE_LONGITUDE)
 
 #5 fill cells in MP25 data sets
-EPAair_PM25_NC2018 <- mutate(EPAair_PM25_NC2018, AQS_PARAMETER_DESC, PM2.5)
+EPAair_PM25_NC2018$AQS_PARAMETER_DESC <- 'PM2.5'
 
-EPAair_PM25_NC2018<- EPAair_PM25_NC2018 %>%
-  pivot_longer(cols = AQS_PARAMETER_DESC, values_to = "PM2.5")
+EPAair_PM25_NC2019$AQS_PARAMETER_DESC <- 'PM2.5'
 
 
-#6
-write.csv(NTL.nutrient.data.PeterPaul, row.names = FALSE, 
-          file = "./Data/Processed/NTL-LTER_Lake_Nutrients_PeterPaul_Processed.csv")
+#6 saved as data files as processed
+write.csv(EPAair_03_NC2018, row.names = FALSE, 
+          file = "./Data/Processed/EPAair_03_NC2018_processed.csv")
+
+write.csv(EPAair_03_NC2019, row.names = FALSE, 
+          file = "./Data/Processed/EPAair_03_NC2019_processed.csv")
+
+write.csv(EPAair_PM25_NC2018, row.names = FALSE, 
+          file = "./Data/Processed/EPAair_PM25_NC2018_processed.csv")
+
+write.csv(EPAair_PM25_NC2019, row.names = FALSE, 
+          file = "./Data/Processed/EPAair_PM25_NC2019_processed.csv")
+
+
+
 ```
 
 
@@ -121,15 +132,39 @@ write.csv(NTL.nutrient.data.PeterPaul, row.names = FALSE,
 11. Save your processed dataset with the following file name: "EPAair_O3_PM25_NC2122_Processed.csv"
 
 ```{r}
-#7
+#7 combine all dataframes
+EPAair_O3_2018and2019 <- full_join(EPAair_03_NC2018, EPAair_03_NC2019)
 
-#8
+EPAair_PM25_2018and2019 <- full_join(EPAair_PM25_NC2018, EPAair_PM25_NC2019)
 
-#9
+EPAair_O3_PM25_NC2122 <- full_join(EPAair_O3_2018and2019, EPAair_PM25_2018and2019)
+
+#8 Filter dataset with pipe
+EPAair_O3_PM25_NC2122_filtered <- EPAair_O3_PM25_NC2122 %>%
+  filter(Site.Name %in% c("Linville Falls", "Durham Armory", "Leggett", 
+        "Hattie Avenue", "Clemmons Middle", "Mendenhall School", 
+        "Frying Pan Mountain", "West Johnston Co.", "Garinger High School",
+        "Castle Hayne", "Pitt Agri. Center", "Bryson City", 
+        "Millbrook School")) %>%
+  group_by(Date, Site.Name, AQS_PARAMETER_DESC, COUNTY) %>%
+  summarize(AQI_mean = mean(EPAair_O3_PM25_NC2122$DAILY_AQI_VALUE),
+            latitude_mean = mean(EPAair_O3_PM25_NC2122$SITE_LATITUDE),
+            longitude_mean = mean(EPAair_O3_PM25_NC2122$SITE_LONGITUDE)) %>%
+  mutate(Month = month(Date)) %>%
+  mutate(Year = year(Date))
+
+dim(EPAair_O3_PM25_NC2122_filtered)
+
+#9 spread ozone and PM2.5
+EPAair_O3_PM25_NC2122_spread <- EPAair_O3_PM25_NC2122_filtered %>%
+  pivot_wider(names_from = AQS_PARAMETER_DESC, values_from = AQS_PARAMETER_DESC)
 
 #10
+dim(EPAair_O3_PM25_NC2122_spread)
 
 #11
+write.csv(EPAair_O3_PM25_NC2122_spread, row.names = FALSE, 
+          file ="./Data/Processed/EPAair_O3_PM25_NC2122_Processed.csv")
 
 ```
 
@@ -144,9 +179,17 @@ write.csv(NTL.nutrient.data.PeterPaul, row.names = FALSE,
 
 ```{r}
 #12(a,b)
+EPAair_O3_PM25_NC2122_summary <- EPAair_O3_PM25_NC2122_spread %>%
+  group_by(Site.Name, Month, Year) %>%
+  summarise(AQI_mean_ozone = mean(Ozone),
+            AQI_mean_PM2.5 = mean(PM2.5)) %>%
+  filter(!is.na(AQI_mean_ozone & AQI_mean_PM2.5))
 
+filter(drop_na(AQI_mean_ozone, AQI_mean_PM2.5))
+  
 
 #13
+dim(EPAair_O3_PM25_NC2122_summary)
 
 ```
 
