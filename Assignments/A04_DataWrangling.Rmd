@@ -26,7 +26,7 @@ The completed exercise is due on Monday, Feb 7 @ 7:00pm.
 ```{r, message = FALSE}
 #1
 getwd()
-setwd("C:/Users/Tasha Griffiths/Documents/Duke Year 1/Spring 22 Classes/Environmental Data Analytics/GithubRepos/Environmental_Data_Analytics_2022")
+#setwd("C:/Users/Tasha Griffiths/Documents/Duke Year 1/Spring 22 Classes/Environmental Data Analytics/GithubRepos/Environmental_Data_Analytics_2022")
 
 #install.packages(tidyverse)
 library(tidyverse)
@@ -52,8 +52,6 @@ head(EPAair_03_NC2018)
 summary(EPAair_03_NC2018)
 str(EPAair_03_NC2018)
 dim(EPAair_03_NC2018)
-
-
 
 ```
 
@@ -113,8 +111,6 @@ write.csv(EPAair_PM25_NC2018, row.names = FALSE,
 write.csv(EPAair_PM25_NC2019, row.names = FALSE, 
           file = "./Data/Processed/EPAair_PM25_NC2019_processed.csv")
 
-
-
 ```
 
 
@@ -157,7 +153,7 @@ dim(EPAair_O3_PM25_NC2122_filtered)
 
 #9 spread ozone and PM2.5
 EPAair_O3_PM25_NC2122_spread <- EPAair_O3_PM25_NC2122_filtered %>%
-  pivot_wider(names_from = AQS_PARAMETER_DESC, values_from = AQS_PARAMETER_DESC)
+  pivot_wider(names_from = AQS_PARAMETER_DESC, values_from = AQI_mean)
 
 #10
 dim(EPAair_O3_PM25_NC2122_spread)
@@ -185,8 +181,8 @@ EPAair_O3_PM25_NC2122_summary <- EPAair_O3_PM25_NC2122_spread %>%
             AQI_mean_PM2.5 = mean(PM2.5)) %>%
   filter(!is.na(AQI_mean_ozone & AQI_mean_PM2.5))
 
-filter(drop_na(AQI_mean_ozone, AQI_mean_PM2.5))
-  
+#filter(drop_na(AQI_mean_ozone & AQI_mean_PM2.5)) drop_na only works for one 
+#column at a time not able to use two columns at once. 
 
 #13
 dim(EPAair_O3_PM25_NC2122_summary)
@@ -195,4 +191,4 @@ dim(EPAair_O3_PM25_NC2122_summary)
 
 14. Why did we use the function `drop_na` rather than `na.omit`?
 
-> Answer: 
+> Answer: drop_na will remove NA's within the column that you specify, but does not use a logic to check between two columns. To remove rows with NA's as true in both columns, we need to use a filter at the is.na function. The na.omit works by removing rows that have any NA's within them, so if an NA exists in ozone or PM2.5 it will be dropped. However, it doesn't check for NA's within both columns.  
