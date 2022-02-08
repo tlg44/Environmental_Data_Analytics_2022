@@ -1,4 +1,4 @@
----
+Does---
 title: "5: Part 1 - Data Visualization Basics"
 author: "Environmental Data Analytics | John Fay and Luana Lima | Developed by Kateri Salk"
 date: "Spring 2022"
@@ -28,7 +28,10 @@ PeterPaul.chem.nutrients <-
   read.csv("./Data/Processed/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv", stringsAsFactors = TRUE)
 PeterPaul.chem.nutrients.gathered <-
   read.csv("./Data/Processed/NTL-LTER_Lake_Nutrients_PeterPaulGathered_Processed.csv", stringsAsFactors = TRUE)
-EPAair <- read.csv("./Data/Processed/EPAair_O3_PM25_NC2021_Processed.csv", stringsAsFactors = TRUE)
+EPAair <- read.csv("./Data/Processed/EPAair_03_PM25_NC2022_Processed.csv", stringsAsFactors = TRUE)
+
+EPAair <- EPAair_O3_PM25_NC2122_Processed
+
 
 EPAair$Date <- as.Date(EPAair$Date, format = "%Y-%m-%d")
 PeterPaul.chem.nutrients$sampledate <- as.Date(PeterPaul.chem.nutrients$sampledate, format = "%Y-%m-%d")
@@ -87,7 +90,7 @@ print(O3plot)
 
 # Fix this code
 O3plot2 <- ggplot(EPAair) +
-  #geom_point(aes(x = Date, y = Ozone, color = "blue"))
+  #geom_point(aes(x = Date, y = Ozone, color = "blue")) This one added a layer to plot with a title to the chart with the color blue as title
   geom_point(aes(x = Date, y = Ozone), color = "blue")
 print(O3plot2)
 
@@ -128,7 +131,7 @@ print(PMplot.line)
 ### Plotting the relationship between two continuous variables: Scatterplot
 
 ```{r, fig.height = 3, fig.width = 4, warning = FALSE}
-# Scatterplot
+# Scatterplot outliers are making the visualization difficult
 lightvsDO <- 
   ggplot(PeterPaul.chem.nutrients, aes(x = irradianceWater, y = dissolvedOxygen)) +
   geom_point()
@@ -142,7 +145,7 @@ lightvsDOfixed <-
   ylim(0, 20)
 print(lightvsDOfixed)
 
-# Depth in the fields of limnology and oceanography is on a reverse scale
+# Depth in the fields of limnology and oceanography is on a reverse scale (you want zero on top and lower depths at bottom)
 tempvsdepth <- 
   ggplot(PeterPaul.chem.nutrients, aes(x = temperature_C, y = depth)) +
   #ggplot(PeterPaul.chem.nutrients, aes(x = temperature_C, y = depth, color = daynum)) +
@@ -153,8 +156,8 @@ print(tempvsdepth)
 NvsP <-
   ggplot(PeterPaul.chem.nutrients, aes(x = tp_ug, y = tn_ug, color = depth)) +
   geom_point() +
-  geom_smooth(method = lm) +
-  geom_abline(aes(slope = 16, intercept = 0))
+  geom_smooth(method = lm) + #this adds in a trend line the lm means linear function
+  geom_abline(aes(slope = 16, intercept = 0)) #this adds in line based on the info you knew
 print(NvsP)
 
 ```
@@ -168,17 +171,17 @@ What might be more effective ways to display the information? Navigate to the bo
 # Box and whiskers plot
 Nutrientplot3 <-
   ggplot(PeterPaul.chem.nutrients.gathered, aes(x = lakename, y = concentration)) +
-  geom_boxplot(aes(color = nutrient)) # Why didn't we use "fill"?
+  geom_boxplot(aes(color = nutrient)) # Why didn't we use "fill" and used color instead? The fill keeps boxplot in a color and all the data outside the box in black. Not as nice/clean
 print(Nutrientplot3)
 
 # Dot plot
 Nutrientplot4 <-
   ggplot(PeterPaul.chem.nutrients.gathered, aes(x = lakename, y = concentration)) +
   geom_dotplot(aes(color = nutrient, fill = nutrient), binaxis = "y", binwidth = 1, 
-               stackdir = "center", position = "dodge", dotsize = 2) #
+               stackdir = "center", position = "dodge", dotsize = 2) #doge means that dots do not overlay but move to the side making it wider where there are more points
 print(Nutrientplot4)
 
-# Violin plot
+# Violin plot - shows density along with spread
 Nutrientplot5 <-
   ggplot(PeterPaul.chem.nutrients.gathered, aes(x = lakename, y = concentration)) +
   geom_violin(aes(color = nutrient)) #
@@ -193,7 +196,7 @@ Nutrientplot6 <-
   geom_freqpoly(aes(x = nh34), color = "blue") +
   geom_freqpoly(aes(x = no23), color = "royalblue") +
   geom_freqpoly(aes(x = po4), color = "red") 
-print(Nutrientplot6)
+print(Nutrientplot6) #missing a legend so not a good way of visualizing easier way is using the next one. 
 
 # Using a gathered dataset
 Nutrientplot7 <-   
@@ -207,7 +210,7 @@ print(Nutrientplot7)
 # Ridgeline plot
 Nutrientplot6 <-
   ggplot(PeterPaul.chem.nutrients.gathered, aes(y = nutrient, x = concentration)) +
-  geom_density_ridges(aes(fill = lakename), alpha = 0.5) #
+  geom_density_ridges(aes(fill = lakename), alpha = 0.5) #fill made color under the curves
 print(Nutrientplot6)
 
 
