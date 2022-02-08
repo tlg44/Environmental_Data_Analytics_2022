@@ -135,6 +135,8 @@ EPAair_PM25_2018and2019 <- full_join(EPAair_PM25_NC2018, EPAair_PM25_NC2019)
 
 EPAair_O3_PM25_NC2122 <- full_join(EPAair_O3_2018and2019, EPAair_PM25_2018and2019)
 
+#filter with intersect gives you all the things that are common intbetween the two data sets. So you can use 2018 data and 2019 data and intsect to see all the sites that are common between the two. 
+
 #8 Filter dataset with pipe
 EPAair_O3_PM25_NC2122_filtered <- EPAair_O3_PM25_NC2122 %>%
   filter(Site.Name %in% c("Linville Falls", "Durham Armory", "Leggett", 
