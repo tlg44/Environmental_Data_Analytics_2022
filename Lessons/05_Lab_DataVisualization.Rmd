@@ -60,6 +60,24 @@ Exercise: build your own scatterplots of PeterPaul.chem.nutrients
 # Color your points by year, and facet by lake in two rows.
 # Change the ylab name
 
+SurfaceTempPlot <-
+  ggplot(PeterPaul.chem.nutrients, aes(x = daynum, y = temperature_C)) +
+  geom_dotplot(aes(color = temperature_C, fill = temperature_C), binaxis = "y", binwidth = 1, 
+               stackdir = "center", position = "dodge", dotsize = 2) 
+print(SurfaceTempPlot)
+
+
+SurfaceTempPlot2 <- ggplot(PeterPaul.chem.nutrients, aes(x = daynum, y = temperature_C, col = year4)) +
+  geom_point() + facet_wrap(vars(lakename)) +
+  ylab("Day of the Year")
+print(SurfaceTempPlot2)
+
+SurfaceTempPlot3 <- ggplot(filter(PeterPaul.chem.nutrients, depth ==0)) +
+  geom_point(aes(x = daynum, y = temperature_C, color=year4)) +
+  facet_wrap('lakename') +
+  ylab('Temerature(C)')
+print(SurfaceTempPlot3)
+
 
 #2. 
 # Plot temperature by date. Color your points by depth.
@@ -67,8 +85,11 @@ Exercise: build your own scatterplots of PeterPaul.chem.nutrients
 # Change the color palette to magma and play with direction (+- 1), which one makes more sense?
 # Change x axis to include marker/labels every 5 years
 
-
-
+Tempbydateplot <- ggplot(PeterPaul.chem.nutrients) + 
+  geom_point(aes( x = sampledate, y = temperature_C, color = depth), size = .5) + 
+  scale_color_viridis(option = 'magma', direction = 1) +
+  scale_x_date(date_breaks = '5 years', date_labels = '%Y')
+print(Tempbydateplot)
 
 ```
 ## Plotting the relationship between two continuous variables: Scatterplot
