@@ -38,17 +38,26 @@ library(tidyverse)
 library(cowplot)
 
 PeterPaul.chem.nutrients <- 
-  read.csv("./Data/Processed/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv", stringsAsFactors = TRUE)
-EPAair <- read.csv("./Data/Processed/EPAair_O3_PM25_NC1819_Processed.csv", stringsAsFactors = TRUE)
+  read.csv("./Data/Processed/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv",
+           stringsAsFactors = TRUE)
+Niwot.Ridge.litter <- read.csv("./Data/Processed/NEON_NIWO_Litter_mass_trap_Processed.csv", 
+                               stringsAsFactors = TRUE)
 
-EPAair$Date <- as.Date(EPAair$Date, format = "%Y-%m-%d")
+class(Niwot.Ridge.litter$collectDate)
+class(PeterPaul.chem.nutrients$sampledate)
+
+Niwot.Ridge.litter$collectDate <- as.Date(Niwot.Ridge.litter$collectDate, format = "%Y-%m-%d")
 PeterPaul.chem.nutrients$sampledate <- as.Date(PeterPaul.chem.nutrients$sampledate, format = "%Y-%m-%d")
 
 
 
 #2 
-class()
-Class()
+class(Niwot.Ridge.litter$collectDate)
+class(PeterPaul.chem.nutrients$sampledate)
+
+Niwot.Ridge.litter$collectDate <- as.Date(Niwot.Ridge.litter$collectDate, format = "%Y-%m-%d")
+PeterPaul.chem.nutrients$sampledate <- as.Date(PeterPaul.chem.nutrients$sampledate, format = "%Y-%m-%d")
+
 
 
 ```
@@ -57,6 +66,14 @@ Class()
 
 ```{r}
 #3
+
+mytheme <- theme_classic(base_size = 12) + 
+  theme(axis.text = element_text(color = "black"), 
+        legend.position = "bottom")
+
+#scale_color_manual(values=c("olivedrab4", "steelblue3"))
+
+theme_set(mytheme) #set theme for all subsequent plots
 
 ```
 
@@ -68,6 +85,18 @@ For numbers 4-7, create ggplot graphs and adjust aesthetics to follow best pract
 ```{r}
 #4
 
+library(ggplot2)
+
+NTL.LTER.plot <- ggplot(PeterPaul.chem.nutrients, aes(x = tp_ug, y = po4, 
+                                                      color = lakename)) + 
+  geom_point() + ylim(0, 50) + #add points and limit outliers
+  scale_color_manual(values=c("olivedrab4", "steelblue3")) + #separate colors for each lake
+  facet_wrap('lakename') +  xlab("Total Phosphorus") + ylab("Phosphate") + #change axis labels to be more clear 
+  geom_smooth(colour="black", method = lm) #adding linear best fit line
+print(NTL.LTER.plot)
+
+
+
 ```
 
 
@@ -75,6 +104,33 @@ For numbers 4-7, create ggplot graphs and adjust aesthetics to follow best pract
 
 ```{r}
 #5
+
+class(PeterPaul.chem.nutrients$month)
+PeterPaul.chem.nutrients$month <- as.factor(PeterPaul.chem.nutrients$month)
+
+#boxplot for a - temperature
+boxplot.temp <- ggplot(PeterPaul.chem.nutrients, aes( x = month, 
+                                                      y = temperature_C, )) + 
+  geom_boxplot(aes(color = lakename))
+print(boxplot.temp)
+  
+#boxplot for b - TP
+boxplot.tp <- ggplot(PeterPaul.chem.nutrients, aes( x = month, 
+                                                      y = tp_ug, )) + 
+  geom_boxplot(aes(color = lakename))
+print(boxplot.tp)
+
+#boxplot for c - TN
+boxplot.tn <- ggplot(PeterPaul.chem.nutrients, aes( x = month, 
+                                                      y = tn_ug, )) + 
+  geom_boxplot(aes(color = lakename))
+print(boxplot.tn)
+
+#cowplot that combines all 3 boxplots
+cowplot.temp.tn.tp <- plot_grid(boxplot.temp, boxplot.tp, boxplot.tn, 
+                                nrow = 1, align = 'h', align = rel_heights = c(1.25, 1))
+print(cowplot.temp.tn.tp)
+
 
 ```
 
