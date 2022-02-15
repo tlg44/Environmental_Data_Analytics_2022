@@ -18,7 +18,8 @@ editor_options:
 ## Set up
 ```{r, message = FALSE}
 library(tidyverse)
-library(agricolae)   
+library(agricolae)
+library(corrplot)
 
 PeterPaul.chem.nutrients <- read.csv("./Data/Processed/NTL-LTER_Lake_Chemistry_Nutrients_PeterPaul_Processed.csv", stringsAsFactors = TRUE)
 # Set date to date format
@@ -73,7 +74,7 @@ Are Ozone levels below the threshold for "good" AQI index (0-50)?
 
 
 summary(EPAair$Ozone)
-EPAair.subsample <- sample_n(EPAair, 5000)
+EPAair.subsample <- sample_n(EPAair, 5000) #shaprio tests doesn't like more than 5K data points
 
 # Evaluate assumption of normal distribution
 shapiro.test((EPAair.subsample$Ozone))
@@ -83,6 +84,9 @@ qqnorm(EPAair$Ozone); qqline(EPAair$Ozone)
 
 O3.onesample <- t.test(EPAair$Ozone, mu = 50, alternative = "less")
 O3.onesample
+
+#class histogram
+hist((EPAair.subsample$Ozone))
 
 Ozone.plot <- ggplot(EPAair, aes(x = Ozone)) +
   #geom_density(stat = "count", fill = "gray") +
