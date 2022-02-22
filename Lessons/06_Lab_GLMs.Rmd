@@ -156,6 +156,32 @@ Create three plots, each with appropriately formatted axes and legends. Choose a
 ```{r}
 #Exercise 2:
 
+#geom_density
+ozone.by.yr <- ggplot(EPAair, aes(x = Ozone, fill = as.factor(Year))) + 
+  geom_density(alpha = 0.5) + labs(title= "Density Plot: Ozone by Year", 
+                                   y = "Density", x= "Ozone AQI Value", 
+                                   fill = "Year") + 
+  scale_fill_manual(values=c('blue', 'yellow'))
+
+print(ozone.by.yr)
+
+
+#bocplot
+ozone.by.yr.box <- ggplot(EPAair, aes(x= as.factor(Year), y = Ozone)) + 
+  geom_boxplot() + stat_summary(geom = 'text', fun.y = max, vjust = -1, 
+                                size = 4, label = c("a","b"), color='red') + 
+  ylim(0,150) + 
+  labs(x = "", y = 'Ozone AQI Value')
+                                                                                                      
+print(ozone.by.yr.box)
+
+
+#Violin
+ozone.violin <- ggplot(EPAair, aes(x= as.factor(Year), y = Ozone)) + 
+  geom_violin(draw_quantiles = 0.5) + stat_summary(geom = 'text', fun.y = max, vjust = -1, size = 4, label = c("a","b"), color='red') + labs(x = "", y = 'Ozone AQI Value')
+                                                                                                      
+print(ozone.violin)
+
 
 ```
 
@@ -168,7 +194,10 @@ For the NTL-LTER dataset, can we predict PM2.5 from Ozone?
 ```{r}
 
 #Exercise 3: Run a linear regression PM2.5 by Ozone. Find the p-value and R-squared value. 
+ozone.lm <- ggplot(EPAair, x = Ozone, y = PM2.5) + geom_point() + geom_smooth(method = 'lm')
+print(ozone.lm)
 
+lm.test <- lm()
 
 
 #Exercise 4: Build a scatterplot. Add a line and standard error for the linear regression. 
@@ -186,12 +215,17 @@ What other variables can we add to improve model?
 
 #Exercise 5: Build correlation plots and identify more possible explanatory variables to add to the regression.
 
+#create a correlation object
+the_cor <- cor(EPAair %>% select(meanLat:Ozone) %>% drop_na())
 
+#plot the matrix
+corrplot(the_cor, upper = 'ellipse')
+corrplot.mixed(the_cor, upper = 'ellipse')
 
 
 #Exercise 6: Choose a model by AIC in a Stepwise Algorithm. Do the results from AIC match the variables you selected on Exercise 5?
 
-
+the_lm6 <- lm(data = EPAair)
 
 
 #Exercise 7: Run another regression using the variables selected on Exercise 6. Compare r-squared value with the one from Exercise 5. 
