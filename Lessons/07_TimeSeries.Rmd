@@ -184,7 +184,7 @@ summary(wind_data$AWND)
 # In real applications you will simply replace NAs
 wind_data_clean <- 
   wind_data %>% 
-  mutate( AWND.clean = zoo::na.approx(AWND) )
+  mutate( AWND.clean = zoo::na.approx(AWND) ) #use this if your NA is not at the begining or end of your data set - can't use NA.omit
 
 summary(wind_data_clean$AWND.clean)
 #Note the NA is gone
@@ -234,13 +234,13 @@ wind_data_trend1 <- Kendall::SeasonalMannKendall(wind_data_ts)
 
 # Inspect results
 wind_data_trend1
-summary(wind_data_trend1)
+summary(wind_data_trend1) # since p-value is less than .05 we have a trend and reject the null hypothesis of no trend. 
 
 
 wind_data_trend2 <- trend::smk.test(wind_data_ts)
 # Inspect results
 wind_data_trend2
-summary(wind_data_trend2)
+summary(wind_data_trend2) # overall decreasing trend
 
 #Visualization
 wind_data_plot <-
