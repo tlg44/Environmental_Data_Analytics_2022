@@ -56,8 +56,8 @@ Temp_BR <- read.csv("./Data/Raw/tas_1901_2016_BRA.csv", stringsAsFactors = TRUE)
 Rainfall_BR_processed <-
   Rainfall_BR %>% 
   rename( Rainfall = Rainfall....MM.) %>% 
-  separate(Statistics,c("Null","Month","Null2")," ") %>% 
-  mutate( Date = my(paste0(Month,"-",Year))) %>% 
+  separate(Statistics,c("Null","Month","Null2")," ") %>% #like the text to columns code in excel, the space is the delimiter. null2 is just the word average. saw a space in the statistics column before month so needed 3 columns to decatenate. 
+  mutate( Date = my(paste0(Month,"-",Year))) %>% #like concatenate in excel
   select(Date,Rainfall)
 
 #Exercise 3: Repeat exercise 2 to the temperature dataset.
@@ -70,7 +70,7 @@ Temp_BR_processed <-
 
 
 #Exercise 4: Join the temperature and rainfall into one tidy data frame with 3 columns: Date, Rainfall and Temperature.
-BRA_complete <- inner_join(Rainfall_BR_processed,Temp_BR_processed)
+BRA_complete <- inner_join(Rainfall_BR_processed,Temp_BR_processed) #joined by date
   
            
 ```
@@ -82,13 +82,23 @@ BRA_complete <- inner_join(Rainfall_BR_processed,Temp_BR_processed)
 
 #Exercise 5: Check if there is any missing data for both temperature and rainfall series.
 
-
-
+head(BRA_complete)
+summary(BRA_complete$Date)
+summary(BRA_complete$Rainfall)
+summary(BRA_complete$Temperature_C)
+#has no NA's in the dataset. 
 
 #Exercise 6: Plot both series over time on separate plots. Add a trend line using geom_smooth(). Can you say something about the trend just by visualizing the data?
 
+plot.rain <- ggplot(BRA_complete, aes(x = Date, y = Rainfall)) + 
+  geom_line() + 
+  geom_smooth(method = "lm")
+print(plot.rain)
 
-
+plot.temp <- ggplot(BRA_complete, aes(x = Date, y = Temperature_C)) + 
+  geom_line() + 
+  geom_smooth(method = "lm")
+print(plot.temp)
 
 
 
@@ -98,6 +108,24 @@ BRA_complete <- inner_join(Rainfall_BR_processed,Temp_BR_processed)
 
 ```{r}
 #Exercise 7: Create a time series objects for each series using ts(). Make sure you specify the starting point and frequency.
+
+#timeseries for rainfall
+f_month <- month(first(Rainfall_BR_processed$Date))
+f_year <- year(first(Rainfall_BR_processed$Date))
+BRA_Rain_TS <- ts(Rainfall_BR_processed$Rainfall, start = c(f_year, f_month), frequency = 12)
+
+#tineseries for temp
+f_month_temp <- month(first(Temp_BR_processed$Date))
+f_year_temp <- year(first(Temp_BR_processed$Date))
+BRA_Temp_TS <- ts(Temp_BR_processed$Temperature_C, start = c(f_year_temp, f_month_temp), frequency = 12)
+
+
+#code from professor the order of fyear and fmonth matters! 
+fmonth <- month(first(BRA_complete$Date))
+fyear <- year(first(BRA_complete$Date))
+
+BR_Rain_ts <- ts(BRA_complete$Rainfall, start = c(fyear, fmonth), frequency = 12)
+BR_Temp_ts <- ts(BRA_complete$Temperature_C, start = c(fyear, fmonth), frequency = 12)
 
 
 
@@ -121,8 +149,19 @@ The `stl` function decomposes the time series object into its component parts. W
 # Exercise 8: Use the stl() function to decompose both series. 
 # Visualize the decomposed series using plot(). What components can you identify?
 
+BRA_Rain_TS_Decomp <- stl(BRA_Rain_TS, s.window = "periodic")
+plot(BRA_Rain_TS_Decomp)
 
+BRA_Temp_TS_Decomp <- stl(BRA_Temp_TS, s.window = "periodic")
+plot(BRA_Temp_TS_Decomp)
 
+BR_Rain_Components <- mutate(BRA_Rain_TS_Decomp$time.series [,1:3])
+
+BR_Temp_Components <- mutate(BRA_Temp_TS_Decomp$time.series [,1:3])
+
+BR_Rain_Components <- mutate(BRA_Rain_Components,
+                             Observed = BRA_complete$Rainfall)
+Date = BRA_complete$Date
 
 
 
@@ -136,7 +175,15 @@ The `stl` function decomposes the time series object into its component parts. W
 
 # Exercise 10: Visualize how the trend maps onto the data for both series
 
+ggplot(BR_Rain_Components) +
+  geom_line(aes(y = Observed, X= Date), size = 0.25) + 
+  geom_line(aes(y= trend, x= Date), color = "red") + 
+  ylab("Rainfall")
 
+ggplot(BR_Temp_Components) +
+  geom_line(aes(y = Observed, X= Date), size = 0.25) + 
+  geom_line(aes(y= trend, x= Date), color = "red") + 
+  ylab("Temperature")
 
 
 
