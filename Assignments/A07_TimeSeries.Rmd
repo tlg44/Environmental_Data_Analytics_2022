@@ -33,6 +33,7 @@ library(tidyverse)
 library(zoo)
 library(trend)
 library(lubridate)
+library(Kendall)
 
 getwd()
 
@@ -118,7 +119,7 @@ print(ozone.line.plot)
 
 ```
 
->Answer: 
+>Answer: Looking at the plot, you can see a slight downward trend in Ozone concenration over time. This indicates that there is some type of relationship and seasonality may be a factor. 
 
 ## Time Series Analysis
 
@@ -128,29 +129,23 @@ Study question: Have ozone concentrations changed over the 2010s at this station
 
 ```{r}
 #8
-GaringerOzoneNA <- GaringerOzone %>% mutate(Daily.Max.8.hour.Ozone.Concentration.clean = zoo::na.approx(Daily.Max.8.hour.Ozone.Concentration))
+GaringerOzoneClean <-
+  GaringerOzone %>%
+  mutate(Daily.Max.8.hour.Ozone.Concentration.clean = zoo::na.approx(Daily.Max.8.hour.Ozone.Concentration))
+
+summary(GaringerOzoneClean)
+
+
+GaringerOzoneClean2 <-
+  GaringerOzone %>%
+  mutate(DAILY_AQI_VALUE.clean = zoo::na.approx(DAILY_AQI_VALUE))
+
+summary(GaringerOzoneClean2)
 
 #plotting to see how its interpolated
-ggplot(GaringerOzoneNA) + 
-  geom_line(aes(x = Date, y = Daily.Max.8.hour.Ozone.Concentration), color = "red") +
+ggplot(GaringerOzoneClean) + 
+  geom_line(aes(x = Date, y = Daily.Max.8.hour.Ozone.Concentration.clean), color = "red") +
   geom_line(aes(x = Date, y = Daily.Max.8.hour.Ozone.Concentration), color = "black")
-
-
-#old notes from lesson
-# Adding new column with no missing obs, just for illustration purpose
-# In real applications you will simply replace NAs
-wind_data_clean <- 
-  wind_data %>% 
-  mutate( AWND.clean = zoo::na.approx(AWND) ) #use this if your NA is not at the begining or end of your data set - can't use NA.omit
-
-summary(wind_data_clean$AWND.clean)
-#Note the NA is gone
-
-ggplot(wind_data_clean ) +
-  geom_line(aes(x = DATE, y = AWND.clean), color = "red") +
-  geom_line(aes(x = DATE, y = AWND), color = "black") +
-  ylab("Average Wind Speed") 
-
 
 
 ```
@@ -162,8 +157,13 @@ ggplot(wind_data_clean ) +
 
 ```{r}
 #9
-
-GaringerOzone.groupings <- GaringerOzone %>% add_column(as.vector(year), as.vector(month))
+GaringerOzone.monthly <- GaringerOzoneClean %>% 
+  mutate(month = month(Date)) %>%
+  mutate(year = year(Date)) %>%
+  group_by(year, month) %>%
+  summarise(mean_Ozone = mean(Daily.Max.8.hour.Ozone.Concentration.clean)) %>%
+  mutate(Date = my(paste0(month, "--", year))) %>%
+  select(Date, mean_Ozone)
 
 ```
 
@@ -172,6 +172,12 @@ GaringerOzone.groupings <- GaringerOzone %>% add_column(as.vector(year), as.vect
 
 ```{r}
 #10
+GaringerOzone.daily.ts <- 
+  ts(GaringerOzoneClean$Daily.Max.8.hour.Ozone.Concentration.clean, 
+     start = c(2010,01,01), frequency = 365)
+
+GaringerOzone.monthly.ts <-
+  ts(GaringerOzone.monthly$mean_Ozone, start = c(2010,01,01), frequency = 12)
 
 
 ```
@@ -181,7 +187,11 @@ GaringerOzone.groupings <- GaringerOzone %>% add_column(as.vector(year), as.vect
 
 ```{r}
 #11
+GaringerOzone.daily.ts.decomp <- stl(GaringerOzone.daily.ts, s.window = "periodic")
+plot(GaringerOzone.daily.ts.decomp)
 
+GaringerOzone.monthly.ts.decomp <- stl(GaringerOzone.monthly.ts, s.window = "periodic")
+plot(GaringerOzone.monthly.ts.decomp)
 
 ```
 
@@ -190,7 +200,11 @@ GaringerOzone.groupings <- GaringerOzone %>% add_column(as.vector(year), as.vect
 
 ```{r}
 #12
+monthly.ozone.trend <- Kendall::SeasonalMannKendall(GaringerOzone.monthly.ts)
+summary(monthly.ozone.trend)
 
+monthly.ozone.trend2 <- trend::smk.test(GaringerOzone.monthly.ts)
+summary(monthly.ozone.trend2)
 
 
 ```
@@ -201,8 +215,15 @@ GaringerOzone.groupings <- GaringerOzone %>% add_column(as.vector(year), as.vect
 
 ```{r}
 # 13
-
-
+plot.mean.monthly.ozone <- ggplot(GaringerOzone.monthly, 
+                                  aes(y = mean_Ozone, x = Date),
+                                  size = 0.25) +
+  geom_line() + 
+  geom_point() + 
+  #geom_smooth(method = "lm") +
+  scale_x_date(date_breaks = "years", date_labels = "%Y") + 
+  labs(x = "Monthly Average by Year", y = "Ozone Concentration")
+print(plot.mean.monthly.ozone)
 
 ```
 
@@ -216,9 +237,23 @@ GaringerOzone.groupings <- GaringerOzone %>% add_column(as.vector(year), as.vect
 
 ```{r}
 #15
+GaringerOzone.monthly.noseason <- as.data.frame(GaringerOzone.monthly.ts.decomp$time.series[,1:3])
 
+GaringerOzone.monthly.noseason <- mutate(GaringerOzone.monthly.noseason,
+         Observed = GaringerOzone.monthly$mean_Ozone,
+         Date = GaringerOzone.monthly$Date)
+
+
+GaringerOzone.monthly.noseason.ts <-
+  ts(GaringerOzone.monthly.noseason$trend, start = c(2010,01,01), frequency = 12)
+
+  
 #16
+
+noseason.kendall.test <- Kendall::SeasonalMannKendall(GaringerOzone.monthly.noseason.ts)
+summary(noseason.kendall.test)
+
 
 ```
 
-> Answer: 
+> Answer: Based on the Mann Kendall test, the P-value is significant (less than .05) - this means that we can beleive that there is a relationship between ozone concentration and trends over time. 
