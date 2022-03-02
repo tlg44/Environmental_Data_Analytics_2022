@@ -1,6 +1,6 @@
 ---
 title: "Assignment 7: Time Series Analysis"
-author: "Student Name"
+author: Tasha Griffiths
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
@@ -28,16 +28,47 @@ The completed exercise is due on Monday, March 14 at 7:00 pm.
 * Set your ggplot theme
 
 ```{r}
-#1
+#1 set up session
+library(tidyverse)
+library(zoo)
+library(trend)
+library(lubridate)
 
+getwd()
+
+#2 Set theme
+mytheme <- theme_classic(base_size = 14) +
+  theme(axis.text = element_text(color = "black"), 
+        legend.position = "top")
+theme_set(mytheme)
 ```
 
 
 2. Import the ten datasets from the Ozone_TimeSeries folder in the Raw data folder. These contain ozone concentrations at Garinger High School in North Carolina from 2010-2019 (the EPA air database only allows downloads for one year at a time). Import these either individually or in bulk and then combine them into a single dataframe named `GaringerOzone` of 3589 observation and 20 variables. 
 
 ```{r, message = FALSE}
-#2
+#2 download 10 datasets
+Ozone.2010 <- read.csv("./Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2010_raw.csv",
+                     stringsAsFactors = TRUE)
+Ozone.2011 <- read.csv("./Data/Raw/Ozone_TimeSeries/EPAair_O3_GaringerNC2011_raw.csv",
+                       stringsAsFactors = TRUE) #got to be a better way!
 
+#import all at once instead
+library(data.table)
+#reset working directory to file
+setwd("./Data/Raw/Ozone_TimeSeries/")
+#import all cvs in the folder
+ozone.10.files <- list.files(pattern = "*.csv")
+#combine all
+ozone_dataset = do.call(rbind, lapply(ozone.10.files, fread))
+#remove file
+rm(Ozone.10.files)
+#turn into a dataframe
+ozone_combined_dataset <- as.data.frame(unclass(ozone_dataset))
+
+#reset working directory back to original
+setwd("../")
+getwd()
 
 ```
 
@@ -52,13 +83,20 @@ The completed exercise is due on Monday, March 14 at 7:00 pm.
 6. Use a `left_join` to combine the data frames. Specify the correct order of data frames within this function so that the final dimensions are 3652 rows and 3 columns. Call your combined data frame GaringerOzone. 
 
 ```{r}
-# 3
+# 3 Set date to date format
+ozone_combined_dataset$Date <- as.Date(ozone_combined_dataset$Date, format = "%m/%d/%Y")
+class(ozone_combined_dataset$Date)
 
-# 4
+# 4 select a subset of the columns
+ozone_combined_dataset_clean <- ozone_combined_dataset %>% select(Date, Daily.Max.8.hour.Ozone.Concentration, DAILY_AQI_VALUE)
 
-# 5
+# 5 fill in missing NA days
+Days <- as.data.frame(seq(from = as.Date("2010-01-01"), to = as.Date("2019-12-31"), by = "days")) 
+colnames(Days) <- "Date"
 
-# 6
+# 6 left_join to combine clean data and date
+GaringerOzone <- left_join(Days, ozone_combined_dataset_clean)
+
 
 ```
 
@@ -67,7 +105,16 @@ The completed exercise is due on Monday, March 14 at 7:00 pm.
 7. Create a line plot depicting ozone concentrations over time. In this case, we will plot actual concentrations in ppm, not AQI values. Format your axes accordingly. Add a smoothed line showing any linear trend of your data. Does your plot suggest a trend in ozone concentration over time?
 
 ```{r}
-#7
+#7 visualize data
+
+ozone.line.plot <- ggplot(GaringerOzone, aes(y = Daily.Max.8.hour.Ozone.Concentration, x = Date), 
+            size = 0.25) + 
+  geom_line() + 
+  geom_smooth(method = "lm") +
+  scale_x_date(date_breaks = "years", date_labels = "%Y") +
+  labs( x= "Year", y = "Ozone Concentration")
+
+print(ozone.line.plot)
 
 ```
 
@@ -81,6 +128,30 @@ Study question: Have ozone concentrations changed over the 2010s at this station
 
 ```{r}
 #8
+GaringerOzoneNA <- GaringerOzone %>% mutate(Daily.Max.8.hour.Ozone.Concentration.clean = zoo::na.approx(Daily.Max.8.hour.Ozone.Concentration))
+
+#plotting to see how its interpolated
+ggplot(GaringerOzoneNA) + 
+  geom_line(aes(x = Date, y = Daily.Max.8.hour.Ozone.Concentration), color = "red") +
+  geom_line(aes(x = Date, y = Daily.Max.8.hour.Ozone.Concentration), color = "black")
+
+
+#old notes from lesson
+# Adding new column with no missing obs, just for illustration purpose
+# In real applications you will simply replace NAs
+wind_data_clean <- 
+  wind_data %>% 
+  mutate( AWND.clean = zoo::na.approx(AWND) ) #use this if your NA is not at the begining or end of your data set - can't use NA.omit
+
+summary(wind_data_clean$AWND.clean)
+#Note the NA is gone
+
+ggplot(wind_data_clean ) +
+  geom_line(aes(x = DATE, y = AWND.clean), color = "red") +
+  geom_line(aes(x = DATE, y = AWND), color = "black") +
+  ylab("Average Wind Speed") 
+
+
 
 ```
 
@@ -91,6 +162,8 @@ Study question: Have ozone concentrations changed over the 2010s at this station
 
 ```{r}
 #9
+
+GaringerOzone.groupings <- GaringerOzone %>% add_column(as.vector(year), as.vector(month))
 
 ```
 
