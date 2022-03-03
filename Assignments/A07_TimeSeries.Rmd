@@ -85,14 +85,16 @@ getwd()
 
 ```{r}
 # 3 Set date to date format
-ozone_combined_dataset$Date <- as.Date(ozone_combined_dataset$Date, format = "%m/%d/%Y")
+ozone_combined_dataset$Date <- as.Date(ozone_combined_dataset$Date,
+                                       format = "%m/%d/%Y")
 class(ozone_combined_dataset$Date)
 
 # 4 select a subset of the columns
 ozone_combined_dataset_clean <- ozone_combined_dataset %>% select(Date, Daily.Max.8.hour.Ozone.Concentration, DAILY_AQI_VALUE)
 
 # 5 fill in missing NA days
-Days <- as.data.frame(seq(from = as.Date("2010-01-01"), to = as.Date("2019-12-31"), by = "days")) 
+Days <- as.data.frame(seq(from = as.Date("2010-01-01"), 
+                          to = as.Date("2019-12-31"), by = "days")) 
 colnames(Days) <- "Date"
 
 # 6 left_join to combine clean data and date
@@ -108,8 +110,9 @@ GaringerOzone <- left_join(Days, ozone_combined_dataset_clean)
 ```{r}
 #7 visualize data
 
-ozone.line.plot <- ggplot(GaringerOzone, aes(y = Daily.Max.8.hour.Ozone.Concentration, x = Date), 
-            size = 0.25) + 
+ozone.line.plot <- ggplot(GaringerOzone, 
+                          aes(y = Daily.Max.8.hour.Ozone.Concentration, 
+                              x = Date), size = 0.25) + 
   geom_line() + 
   geom_smooth(method = "lm") +
   scale_x_date(date_breaks = "years", date_labels = "%Y") +
@@ -119,7 +122,7 @@ print(ozone.line.plot)
 
 ```
 
->Answer: Looking at the plot, you can see a slight downward trend in Ozone concenration over time. This indicates that there is some type of relationship and seasonality may be a factor. 
+>Answer: Looking at the plot, you can see a slight downward trend in daily ozone concenration over time. This indicates that there is some type of relationship over time and it appears that different seasons may play an impact on concentration peaks and valleys. 
 
 ## Time Series Analysis
 
@@ -128,14 +131,14 @@ Study question: Have ozone concentrations changed over the 2010s at this station
 8. Use a linear interpolation to fill in missing daily data for ozone concentration. Why didn't we use a piecewise constant or spline interpolation?
 
 ```{r}
-#8
+#8 fill in missing daily data with linear method
 GaringerOzoneClean <-
   GaringerOzone %>%
   mutate(Daily.Max.8.hour.Ozone.Concentration.clean = zoo::na.approx(Daily.Max.8.hour.Ozone.Concentration))
 
 summary(GaringerOzoneClean)
 
-
+#repeat for AQI
 GaringerOzoneClean2 <-
   GaringerOzone %>%
   mutate(DAILY_AQI_VALUE.clean = zoo::na.approx(DAILY_AQI_VALUE))
@@ -144,19 +147,21 @@ summary(GaringerOzoneClean2)
 
 #plotting to see how its interpolated
 ggplot(GaringerOzoneClean) + 
-  geom_line(aes(x = Date, y = Daily.Max.8.hour.Ozone.Concentration.clean), color = "red") +
-  geom_line(aes(x = Date, y = Daily.Max.8.hour.Ozone.Concentration), color = "black")
+  geom_line(aes(x = Date, y = Daily.Max.8.hour.Ozone.Concentration.clean),
+            color = "red") +
+  geom_line(aes(x = Date, y = Daily.Max.8.hour.Ozone.Concentration), 
+            color = "black")
 
 
 ```
 
-> Answer:  
+> Answer: The linear interpolation made the most sense for the missing daily data, since they were very short periods of missing data. If we were missing years at a time, it would make more sense to use a different interpolation method. THe picewise constant is helpful if you want to assume that missing data is equal to a neighbor, but since we are missing just a daily data - we know that it will fall somewhere between the previous and next measurement so the linear method makes the most sense. The spline method uses a quadratic function, which is also not necessary for this data set as the linear straight line connections are what we want.  
 
 
 9. Create a new data frame called `GaringerOzone.monthly` that contains aggregated data: mean ozone concentrations for each month. In your pipe, you will need to first add columns for year and month to form the groupings. In a separate line of code, create a new Date column with each month-year combination being set as the first day of the month (this is for graphing purposes only)
 
 ```{r}
-#9
+#9 new dataframe for aggregated daily to monthly data
 GaringerOzone.monthly <- GaringerOzoneClean %>% 
   mutate(month = month(Date)) %>%
   mutate(year = year(Date)) %>%
@@ -171,7 +176,7 @@ GaringerOzone.monthly <- GaringerOzoneClean %>%
 10. Generate two time series objects. Name the first `GaringerOzone.daily.ts` and base it on the dataframe of daily observations. Name the second `GaringerOzone.monthly.ts` and base it on the monthly average ozone values. Be sure that each specifies the correct start and end dates and the frequency of the time series.
 
 ```{r}
-#10
+#10 create a daily and monthly separate timeseries
 GaringerOzone.daily.ts <- 
   ts(GaringerOzoneClean$Daily.Max.8.hour.Ozone.Concentration.clean, 
      start = c(2010,01,01), frequency = 365)
@@ -186,12 +191,16 @@ GaringerOzone.monthly.ts <-
 11. Decompose the daily and the monthly time series objects and plot the components using the `plot()` function.
 
 ```{r}
-#11
-GaringerOzone.daily.ts.decomp <- stl(GaringerOzone.daily.ts, s.window = "periodic")
+#11 decompose the two timeseries and check plots
+GaringerOzone.daily.ts.decomp <- stl(GaringerOzone.daily.ts,
+                                     s.window = "periodic")
 plot(GaringerOzone.daily.ts.decomp)
 
-GaringerOzone.monthly.ts.decomp <- stl(GaringerOzone.monthly.ts, s.window = "periodic")
+GaringerOzone.monthly.ts.decomp <- stl(GaringerOzone.monthly.ts,
+                                       s.window = "periodic")
 plot(GaringerOzone.monthly.ts.decomp)
+
+#it makes sense that the daily decomp has thicker lines, since it has much more data points than the aggregated monthly data that shows the smoother trend. 
 
 ```
 
@@ -199,7 +208,7 @@ plot(GaringerOzone.monthly.ts.decomp)
 12. Run a monotonic trend analysis for the monthly Ozone series. In this case the seasonal Mann-Kendall is most appropriate; why is this?
 
 ```{r}
-#12
+#12 monotonic trend analysis both Kendall and smk(seasonal)
 monthly.ozone.trend <- Kendall::SeasonalMannKendall(GaringerOzone.monthly.ts)
 summary(monthly.ozone.trend)
 
@@ -209,7 +218,7 @@ summary(monthly.ozone.trend2)
 
 ```
 
-> Answer:  
+> Answer:  The general Mann-Kendall test assumes no seasonality - however, it is clear from the visualizations that there is some seasonal impact on the daily ozone concentrations, so it makes sense to use the SeasonalMann-Kendall test instead. That way the cyclical nature of the data can be accounted for in the trend test. These tests are for monotonic movement where the variable consistently increases or decreases over time. 
 
 13. Create a plot depicting mean monthly ozone concentrations over time, with both a geom_point and a geom_line layer. Edit your axis labels accordingly.
 
@@ -229,7 +238,7 @@ print(plot.mean.monthly.ozone)
 
 14. To accompany your graph, summarize your results in context of the research question. Include output from the statistical test in parentheses at the end of your sentence. Feel free to use multiple sentences in your interpretation.
 
-> Answer: 
+> Answer: Our study question was: Have ozone concentrations changed over the 2010s at this station? The answer is yes, since we were able to rejct the null hypothesis based on the results of our Mann-Kendall seasonal test. The pvalue for the seasonal kendall test is just barely less than .05 (it is .046724) meaning that we can reject the null hypothesis of no monotonic trend and we can see a trend is present.
 
 15. Subtract the seasonal component from the `GaringerOzone.monthly.ts`. Hint: Look at how we extracted the series components for the EnoDischarge on the lesson Rmd file.
 
@@ -256,4 +265,4 @@ summary(noseason.kendall.test)
 
 ```
 
-> Answer: Based on the Mann Kendall test, the P-value is significant (less than .05) - this means that we can beleive that there is a relationship between ozone concentration and trends over time. 
+> Answer: When we subtract the seasonal component from our data, we see a significant impact on the Mann-Kendall test's p-value. The pvalue changes from .o4 to 2.291e-5. This means that when seasonality is removed, we can even more strongly reject the null hypothesis of no monotonic trend and conclude that there is a trend from 2010 to 2020.
