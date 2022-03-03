@@ -223,7 +223,7 @@ summary(monthly.ozone.trend2)
 13. Create a plot depicting mean monthly ozone concentrations over time, with both a geom_point and a geom_line layer. Edit your axis labels accordingly.
 
 ```{r}
-# 13
+# 13 visualize data over time
 plot.mean.monthly.ozone <- ggplot(GaringerOzone.monthly, 
                                   aes(y = mean_Ozone, x = Date),
                                   size = 0.25) +
@@ -245,23 +245,28 @@ print(plot.mean.monthly.ozone)
 16. Run the Mann Kendall test on the non-seasonal Ozone monthly series. Compare the results with the ones obtained with the Seasonal Mann Kendall on the complete series.
 
 ```{r}
-#15
-GaringerOzone.monthly.noseason <- as.data.frame(GaringerOzone.monthly.ts.decomp$time.series[,1:3])
+#15 remove the seasonal component from data
+GaringerOzone.monthly.noseason <- 
+  as.data.frame(GaringerOzone.monthly.ts.decomp$time.series[,1:3])
 
 GaringerOzone.monthly.noseason <- mutate(GaringerOzone.monthly.noseason,
          Observed = GaringerOzone.monthly$mean_Ozone,
          Date = GaringerOzone.monthly$Date)
 
-
+#turn it in to a time series so we can use trend tests
 GaringerOzone.monthly.noseason.ts <-
-  ts(GaringerOzone.monthly.noseason$trend, start = c(2010,01,01), frequency = 12)
+  ts(GaringerOzone.monthly.noseason$trend, 
+     start = c(2010,01,01), frequency = 12)
 
   
-#16
-
-noseason.kendall.test <- Kendall::SeasonalMannKendall(GaringerOzone.monthly.noseason.ts)
+#16 run the Mann Kendall test
+noseason.kendall.test <- 
+  Kendall::SeasonalMannKendall(GaringerOzone.monthly.noseason.ts)
 summary(noseason.kendall.test)
 
+#fix directory so we can knit
+setwd("C:/Users/Tasha Griffiths/Documents/Duke Year 1/Spring 22 Classes/Environmental Data Analytics/GithubRepos/Environmental_Data_Analytics_2022")
+getwd()
 
 ```
 
