@@ -63,7 +63,6 @@ st_crs(Counties) #to see all the datum info
 ggplot(data=Counties) +
   geom_sf()
 
-
 ```
 
 6. What is the EPSG code of the Counties dataset? Is this a geographic or a projected coordinate reference system? (Or, does this CRS use angular or planar coordinate units?) To what datum is this CRS associated? (Tip: look the EPSG code on <https://spatialreference.org>) 
