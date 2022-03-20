@@ -208,8 +208,8 @@ Up next we will do some spatial analysis with our data. To prepare for this, we 
 Counties_UTM <- st_transform(Counties, crs= 32614)
 siteflow_sf_UTM <- st_transform(siteflow_sf, crs = 32614)
 
-gage_locations_UTM <- st_transform(gagelocations_sf, crs = 32614)
-
+#gage_locations_UTM <- st_transform(gagelocations_sf, crs = 32614)
+#checking for errors with obs. differences
 
 #21 Plot the data
 ggplot() +
@@ -217,9 +217,10 @@ ggplot() +
   geom_sf(data = siteflow_sf_UTM, color = 'black')
 
 
-ggplot() +
-  geom_sf(data = Counties_UTM, fill='tan', size=1) +
-  geom_sf(data = gage_locations_UTM, color = 'black')
+#ggplot() +
+  #geom_sf(data = Counties_UTM, fill='tan', size=1) +
+  #geom_sf(data = gage_locations_UTM, color = 'black')
+#checking for errors with obs. differences
 
 ```
 
