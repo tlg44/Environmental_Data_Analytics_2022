@@ -97,6 +97,8 @@ the_registrant <- webpage %>%
   html_nodes(".table tr:nth-child(1) td:nth-child(2)") %>% 
   html_text()
 the_registrant
+
+#html nodes grads the specific nested tags you want from the html view source of the website.
 ```
 
 EXERCISE:
