@@ -238,13 +238,23 @@ net_generation <- the_website %>% html_nodes('td:nth-child(4)') %>% html_text()
 total_retail <- the_website %>% html_nodes('td:nth-child(5)') %>% html_text()
   
 #3 Construct a dataframe from the values
+#oldcode the_df <- data.frame(
+ # "State" = the_states,
+#  "Price" = as.numeric(the_price),
+#  "Capacity" = as.numeric(gsub",","",(the_capacity)),
+#  "Generation" = as.numeric(gsub",","",(net_generation)), 
+#  "Total_Retail" = as.numeric(gsub",","",(total_retail)),
+#)
+
+
 the_df <- data.frame(
-  "State" = the_states,
-  "Price" = as.numeric(the_price),
-  "Capacity" = as.numeric(gsub",","",(the_capacity)),
-  "Generation" = as.numeric(gsub",","",(net_generation)), 
-  "Total_Retail" = as.numeric(gsub",","",(total_retail)),
+"State" = the_states,
+"Price" = as.numeric(the_price),
+"Capacity" = as.numeric(gsub(",","",the_capacity)),
+"Generation" = gsub(",","",net_generation),
+"Total_retail" = gsub(",","",total_retail)
 )
+
 
 #html nodes grads the specific nested tags you want from the html view source of the website.
 ```

@@ -1,6 +1,6 @@
 ---
 title: "Assignment 09: Data Scraping"
-author: "Student Name"
+author: Tasha Griffiths
 output: pdf_document
 geometry: margin=2.54cm
 editor_options: 
@@ -29,7 +29,23 @@ This exercise accompanies the lessons in Environmental Data Analytics on data sc
 * Set your ggplot theme
 
 ```{r, message = FALSE}
-#1
+#1. check directory
+getwd()
+
+
+#2. load libraries
+library(tidyverse)
+library(lubridate)
+library(viridis)
+library(rvest)
+library(dataRetrieval)
+library(tidycensus)
+
+# Set theme
+mytheme <- theme_classic() +
+  theme(axis.text = element_text(color = "black"), 
+        legend.position = "top")
+theme_set(mytheme)
 
 
 ```
@@ -45,7 +61,8 @@ Indicate this website as the as the URL to be scraped. (In other words, read the
 
 ```{r set.the.scraping.website}
 #2
-
+webpageNC_DEQ <- read_html('https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=03-32-010&year=2020')
+webpageNC_DEQ
 
 ```
 
@@ -57,7 +74,7 @@ Indicate this website as the as the URL to be scraped. (In other words, read the
  * Ownership
  
 * From the "3. Water Supply Sources" section:
- * Average Daily Use (MGD) - for each month
+ * Maximum Daily Use (MGD) - for each month
 
 In the code chunk below scrape these values, assigning them to three separate variables.
 
@@ -65,10 +82,25 @@ In the code chunk below scrape these values, assigning them to three separate va
 
 ```{r scrape.the.data}
 #3
-water.system.name <- 
-pswid <- 
-ownership <- 
-max.withdrawals.mgd <- 
+water.system.name <- webpageNC_DEQ %>% 
+  html_nodes("div+ table tr:nth-child(1) td:nth-child(2)") %>% 
+  html_text()
+water.system.name
+
+pswid <- webpageNC_DEQ %>% 
+  html_nodes("td tr:nth-child(1) td:nth-child(5)") %>% 
+  html_text()
+pswid
+  
+ownership <- webpageNC_DEQ %>% 
+  html_nodes("div+ table tr:nth-child(2) td:nth-child(4)") %>% 
+  html_text()
+ownership
+  
+max.withdrawals.mgd <- webpageNC_DEQ %>% 
+  html_nodes("th~ td+ td") %>% 
+  html_text()
+max.withdrawals.mgd
 
 ```
 
@@ -82,12 +114,39 @@ max.withdrawals.mgd <-
 5. Plot the max daily withdrawals across the months for 2020
 
 ```{r create.a.dataframe.from.scraped.data}
-#4
+#4 convert max withdrawls to dataframe
 
+#need to pull month information from web table
+max.withdrawls.month <- webpageNC_DEQ %>% 
+  html_nodes(".fancy-table:nth-child(31) tr+ tr th") %>% 
+  html_text()
+max.withdrawals.month
 
+#create a year variable to add to dataframe
+max.withdrawls.year <- 2020
 
-#5
+#create the dataframe
+the_df <- data.frame(
+"Water System Name" = water.system.name,
+"PSWID" = pswid,
+"Ownership" = ownership,
+"Max Withdrawls Total" = as.numeric(max.withdrawals.mgd),
+"Max Withdrawls Month" = max.withdrawls.month,
+"Max Withdrawls Year" = max.withdrawls.year
+)
 
+#add a date column to dataframe (month and year in data format) couldn't figure out
+the_df[nrow(the_df) +1,] <- c()
+
+max.withdrawls.date <- rbind(max.withdrawls.month, max.withdrawls.year)
+
+#5 Plot couldn't get a line to work? maybe bar chart better?
+ggplot(the_df,aes(x=max.withdrawls.month,y=max.withdrawals.mgd)) + 
+  geom_point() +
+  labs(title = paste("2020 Max Withdrawls for", water.system.name),
+       subtitle = paste("PSWID", pswid),
+       y="Max Withdrawls",
+       x="Month")
 
 
 ```
@@ -95,7 +154,66 @@ max.withdrawals.mgd <-
 6. Note that the PWSID and the year appear in the web address for the page we scraped. Construct a function using your code above that can scrape data for any PWSID and year for which the NC DEQ has data. **Be sure to modify the code to reflect the year and site scraped**.
 
 ```{r construct.a.scraping.function}
-#6.
+#6. create a function to scrape data for any PSWID and Year (NEEDS two variables year and pswid, maybe two separate if/else statements??)
+scrape.function <- function(pswid){
+  the_url <- ifelse(pswid == 03-32-010,
+                    'https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=03-32-010&year=2020',
+                    gsub('03-32-010', pswid, 'https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=03-32-010&year=2020'))
+
+   #Fetch the website
+webpageNC_DEQ <- read_html('https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=03-32-010&year=2020') 
+  
+  #Scrape the data
+water.system.name <- webpageNC_DEQ %>% 
+  html_nodes("div+ table tr:nth-child(1) td:nth-child(2)") %>% 
+  html_text()
+water.system.name
+
+pswid <- webpageNC_DEQ %>% 
+  html_nodes("td tr:nth-child(1) td:nth-child(5)") %>% 
+  html_text()
+pswid
+  
+ownership <- webpageNC_DEQ %>% 
+  html_nodes("div+ table tr:nth-child(2) td:nth-child(4)") %>% 
+  html_text()
+ownership
+  
+max.withdrawals.mgd <- webpageNC_DEQ %>% 
+  html_nodes("th~ td+ td") %>% 
+  html_text()
+max.withdrawals.mgd
+  
+  #Convert to dataframe
+  #<enter code from above here>
+  
+  #Return the dataframe
+  return(the_df)
+}
+
+
+scrape.it <- function(the_year){
+  #Get the proper url
+  the_url <- ifelse(the_year==2020,
+                    'https://www.eia.gov/electricity/state/', 
+                    gsub('2019',the_year, 'https://www.eia.gov/electricity/state/archive/'))
+
+  #Fetch the website
+  #<enter code from above here> 
+  
+  #Scrape the data
+  #<enter code from above here>
+  
+  #Convert to dataframe
+  #<enter code from above here>
+  
+  #Return the dataframe
+  return(the_df)
+}
+
+
+webpageNC_DEQ <- read_html('https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=03-32-010&year=2020')
+webpageNC_DEQ
 
 
 
