@@ -176,79 +176,23 @@ Withdrawls.scrape.function <- function(any_year, pswid_number){
   web.withdrawls.month <- the_url %>% html_nodes(max.withdrawls.month.new) %>% html_text()
  
   #convert to dataframe
-  new.dataframe <- data.frame("Water System Name" = water.system.name.new,
-                              "PSWID" = pswid.new,
-                              "Ownership" = ownership.new,
-                              "Max Withdrawls Total" = as.numeric(max.withdrawals.mgd.new),
-                              "Max Withdrawls Month" = max.withdrawls.month.new,
-                              "Max Withdrawls Year" = max.withdrawls.year.new,
-                              "Date" = as.Date(my(paste(max.withdrawls.month.new, "-",
-                                                        max.withdrawls.year.new)))
+  new.dataframe <- data.frame("Water System Name" = web.system.name,
+                              "PSWID" = web.pswid,
+                              "Ownership" = web.ownership,
+                              "Max_Withdrawls_Total" = as.numeric(web.max.withdrawls),
+                              "Max_Withdrawls_Month" = web.withdrawls.month,
+                              "Max_Withdrawls_Year" = max.withdrawls.year.new #,
+                              #"Date" = as.Date(my(paste(web.max.withdrawls, "-",
+                                                        #max.withdrawls.year.new)))
 )
+  
+  #wrangle new dataframe
+  new.dataframe <- new.dataframe %>% mutate("Date" = my(paste(Max_Withdrawls_Month, "-",
+                                                        Max_Withdrawls_Year)))
+  
   #show the dataframe
   return(new.dataframe)
 }
-
-
-
-#old code dont look
-scrape.function <- function(pswid){
-  the_url <- ifelse(pswid == 03-32-010,
-                    'https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=03-32-010&year=2020',
-                    gsub('03-32-010', pswid, 'https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=03-32-010&year=2020'))
-
-   #Fetch the website
-webpageNC_DEQ <- read_html('https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=03-32-010&year=2020') 
-  
-  #Scrape the data
-water.system.name <- webpageNC_DEQ %>% 
-  html_nodes("div+ table tr:nth-child(1) td:nth-child(2)") %>% 
-  html_text()
-water.system.name
-
-pswid <- webpageNC_DEQ %>% 
-  html_nodes("td tr:nth-child(1) td:nth-child(5)") %>% 
-  html_text()
-pswid
-  
-ownership <- webpageNC_DEQ %>% 
-  html_nodes("div+ table tr:nth-child(2) td:nth-child(4)") %>% 
-  html_text()
-ownership
-  
-max.withdrawals.mgd <- webpageNC_DEQ %>% 
-  html_nodes("th~ td+ td") %>% 
-  html_text()
-max.withdrawals.mgd
-  
-  #Convert to dataframe
-  #<enter code from above here>
-  
-  #Return the dataframe
-  return(the_df)
-}
-
-
-scrape.it <- function(the_year){
-  #Get the proper url
-  the_url <- ifelse(the_year==2020,
-                    'https://www.eia.gov/electricity/state/', 
-                    gsub('2019',the_year, 'https://www.eia.gov/electricity/state/archive/'))
-
-  #Fetch the website
-  #<enter code from above here> 
-  
-  #Scrape the data
-  #<enter code from above here>
-  
-  #Convert to dataframe
-  #<enter code from above here>
-  
-  #Return the dataframe
-  return(the_df)
-}
-
-
 
 ```
 
@@ -261,20 +205,11 @@ view(durham.2015.withdrawls)
 
 #plot 1
 ggplot(durham.2015.withdrawls) +
-  geom_point(aes(x=max.withdrawls.month.new,y=max.withdrawals.mgd.new)) +
-  labs(title = paste("2020 Max Withdrawls for", water.system.name.new),
-       subtitle = paste("PSWID", pswid.new),
-       y="Max Withdrawls",
-       x="Month")
-
-#plot 2 just in case
-ggplot(durham.2015.withdrawls,aes(x=max.withdrawls.month,y=max.withdrawals.mgd)) + 
-  geom_point() +
+  geom_point(aes(x=Date,y=Max_Withdrawls_Total)) +
   labs(title = paste("2020 Max Withdrawls for", water.system.name),
-       subtitle = paste("PSWID", pswid),
+       subtitle = paste("PSWID", durham.2015.withdrawls$PSWID),
        y="Max Withdrawls",
        x="Month")
-
 
 ```
 
@@ -282,7 +217,7 @@ ggplot(durham.2015.withdrawls,aes(x=max.withdrawls.month,y=max.withdrawals.mgd))
 
 ```{r fetch.and.plot.Durham.2015.data}
 #8 scape data for new location
-asheville.2015.withdrawls <- Withdrawls.scrape.function(2015,'01-11-010')
+asheville.2015.withdrawls <- Withdrawls.scrape.function('2015','01-11-010')
 view(asheville.2015.withdrawls)
 
 #plot
