@@ -206,7 +206,7 @@ view(durham.2015.withdrawls)
 #plot 1
 ggplot(durham.2015.withdrawls) +
   geom_point(aes(x=Date,y=Max_Withdrawls_Total)) +
-  labs(title = paste("2020 Max Withdrawls for", water.system.name),
+  labs(title = paste("2015 Max Withdrawls for", water.system.name),
        subtitle = paste("PSWID", durham.2015.withdrawls$PSWID),
        y="Max Withdrawls",
        x="Month")
@@ -221,7 +221,12 @@ asheville.2015.withdrawls <- Withdrawls.scrape.function('2015','01-11-010')
 view(asheville.2015.withdrawls)
 
 #plot
-
+ggplot(asheville.2015.withdrawls) +
+  geom_point(aes(x=Date,y=Max_Withdrawls_Total)) +
+  labs(title = paste("2020 Max Withdrawls for", water.system.name),
+       subtitle = paste("PSWID", durham.2015.withdrawls$PSWID),
+       y="Max Withdrawls",
+       x="Month")
 
 ```
 
