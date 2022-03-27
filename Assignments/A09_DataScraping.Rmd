@@ -122,8 +122,10 @@ max.withdrawls.month <- webpageNC_DEQ %>%
   html_text()
 max.withdrawals.month
 
-#create a year variable to add to dataframe
+#create a year and date variable to add to dataframe
 max.withdrawls.year <- 2020
+Date <- as.Date(my(paste(max.withdrawls.month, "-", max.withdrawls.year)))
+class (Date)
 
 #create the dataframe
 the_df <- data.frame(
@@ -132,13 +134,10 @@ the_df <- data.frame(
 "Ownership" = ownership,
 "Max Withdrawls Total" = as.numeric(max.withdrawals.mgd),
 "Max Withdrawls Month" = max.withdrawls.month,
-"Max Withdrawls Year" = max.withdrawls.year
+"Max Withdrawls Year" = max.withdrawls.year,
+"Date" = as.Date(my(paste(max.withdrawls.month, "-", max.withdrawls.year)))
 )
 
-#add a date column to dataframe (month and year in data format) couldn't figure out
-the_df[nrow(the_df) +1,] <- c()
-
-max.withdrawls.date <- rbind(max.withdrawls.month, max.withdrawls.year)
 
 #5 Plot couldn't get a line to work? maybe bar chart better?
 ggplot(the_df,aes(x=max.withdrawls.month,y=max.withdrawals.mgd)) + 
@@ -148,13 +147,51 @@ ggplot(the_df,aes(x=max.withdrawls.month,y=max.withdrawals.mgd)) +
        y="Max Withdrawls",
        x="Month")
 
-
 ```
 
 6. Note that the PWSID and the year appear in the web address for the page we scraped. Construct a function using your code above that can scrape data for any PWSID and year for which the NC DEQ has data. **Be sure to modify the code to reflect the year and site scraped**.
 
 ```{r construct.a.scraping.function}
-#6. create a function to scrape data for any PSWID and Year (NEEDS two variables year and pswid, maybe two separate if/else statements??)
+#6. create a function to scrape data for any PSWID and Year
+
+Withdrawls.scrape.function <- function(any_year, pswid_number){
+  #fetch website
+  the_url <- read_html(paste0('https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid='
+                    ,pswid_number, '&year=',any_year))
+  print(the_url)
+  
+  #scrape data
+  water.system.name.new <- "div+ table tr:nth-child(1) td:nth-child(2)"
+  pswid.new <- "td tr:nth-child(1) td:nth-child(5)"
+  ownership.new <- "div+ table tr:nth-child(2) td:nth-child(4)"
+  max.withdrawals.mgd.new <- "th~ td+ td"
+  max.withdrawls.month.new <- ".fancy-table:nth-child(31) tr+ tr th"
+  max.withdrawls.year.new <- any_year
+  
+  
+  web.system.name <- the_url %>% html_nodes(water.system.name.new) %>% html_text()
+  web.pswid <- the_url %>% html_nodes(pswid.new) %>% html_text()
+  web.ownership <- the_url %>% html_nodes(ownership.new) %>% html_text()
+  web.max.withdrawls <- the_url %>% html_nodes(max.withdrawals.mgd.new) %>% html_text()
+  web.withdrawls.month <- the_url %>% html_nodes(max.withdrawls.month.new) %>% html_text()
+ 
+  #convert to dataframe
+  new.dataframe <- data.frame("Water System Name" = water.system.name.new,
+                              "PSWID" = pswid.new,
+                              "Ownership" = ownership.new,
+                              "Max Withdrawls Total" = as.numeric(max.withdrawals.mgd.new),
+                              "Max Withdrawls Month" = max.withdrawls.month.new,
+                              "Max Withdrawls Year" = max.withdrawls.year.new,
+                              "Date" = as.Date(my(paste(max.withdrawls.month.new, "-",
+                                                        max.withdrawls.year.new)))
+)
+  #show the dataframe
+  return(new.dataframe)
+}
+
+
+
+#old code dont look
 scrape.function <- function(pswid){
   the_url <- ifelse(pswid == 03-32-010,
                     'https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=03-32-010&year=2020',
@@ -212,17 +249,31 @@ scrape.it <- function(the_year){
 }
 
 
-webpageNC_DEQ <- read_html('https://www.ncwater.org/WUDC/app/LWSP/report.php?pwsid=03-32-010&year=2020')
-webpageNC_DEQ
-
-
 
 ```
 
 7. Use the function above to extract and plot max daily withdrawals for Durham (PWSID='03-32-010') for each month in 2015
 
 ```{r fetch.and.plot.Durham.2015.data}
-#7
+#7 scape data for new year
+durham.2015.withdrawls <- Withdrawls.scrape.function('2015','03-32-010')
+view(durham.2015.withdrawls)
+
+#plot 1
+ggplot(durham.2015.withdrawls) +
+  geom_point(aes(x=max.withdrawls.month.new,y=max.withdrawals.mgd.new)) +
+  labs(title = paste("2020 Max Withdrawls for", water.system.name.new),
+       subtitle = paste("PSWID", pswid.new),
+       y="Max Withdrawls",
+       x="Month")
+
+#plot 2 just in case
+ggplot(durham.2015.withdrawls,aes(x=max.withdrawls.month,y=max.withdrawals.mgd)) + 
+  geom_point() +
+  labs(title = paste("2020 Max Withdrawls for", water.system.name),
+       subtitle = paste("PSWID", pswid),
+       y="Max Withdrawls",
+       x="Month")
 
 
 ```
@@ -230,7 +281,11 @@ webpageNC_DEQ
 8. Use the function above to extract data for Asheville (PWSID = 01-11-010) in 2015. Combine this data with the Durham data collected above and create a plot that compares the Asheville to Durham's water withdrawals.
 
 ```{r fetch.and.plot.Durham.2015.data}
-#8
+#8 scape data for new location
+asheville.2015.withdrawls <- Withdrawls.scrape.function(2015,'01-11-010')
+view(asheville.2015.withdrawls)
+
+#plot
 
 
 ```
@@ -239,8 +294,17 @@ webpageNC_DEQ
 9. Use the code & function you created above to plot Asheville's max daily withdrawal by months for the years 2010 thru 2019.Add a smoothed line to the plot.
 
 ```{r}
-#9
+#9 scrape 2010 to 2019
+any_year = seq(2010,2020)
+pswid = '01-11-010'
 
+
+ggplot(durham.2015.withdrawls) +
+  geom_point(aes(x=max.withdrawls.month.new,y=max.withdrawals.mgd.new)) +
+  labs(title = paste("2020 Max Withdrawls for", water.system.name.new),
+       subtitle = paste("PSWID", pswid.new),
+       y="Max Withdrawls",
+       x="Month")
 
 ```
 
