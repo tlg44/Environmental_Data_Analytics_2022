@@ -187,7 +187,7 @@ Withdrawls.scrape.function <- function(any_year, pswid_number){
 )
   
   #wrangle new dataframe
-  new.dataframe <- new.dataframe %>% mutate("Date" = my(paste(Max_Withdrawls_Month, "-",
+  new.dataframe <- new.dataframe %>% mutate("Date_New" = my(paste(Max_Withdrawls_Month, "-",
                                                         Max_Withdrawls_Year)))
   
   #show the dataframe
@@ -205,7 +205,7 @@ view(durham.2015.withdrawls)
 
 #plot 1
 ggplot(durham.2015.withdrawls) +
-  geom_point(aes(x=Date,y=Max_Withdrawls_Total)) +
+  geom_point(aes(x=Date_New,y=Max_Withdrawls_Total)) +
   labs(title = paste("2015 Max Withdrawls for", water.system.name),
        subtitle = paste("PSWID", durham.2015.withdrawls$PSWID),
        y="Max Withdrawls",
@@ -228,7 +228,16 @@ ggplot(asheville.2015.withdrawls) +
        y="Max Withdrawls",
        x="Month")
 
-#after spending over 10 hours on this assignment, reviewing lessons, lab and slack I was unable to finish. I kept running into more and more errors with the function reading other sites. Unfortunately I cannot spend any more time on this assignment. 
+ggplot() + 
+geom_line(data=durham.2015.withdrawls, aes(x=Date_New, y=Max_Withdrawls_Total), color='green') + 
+geom_line(data=asheville.2015.withdrawls, aes(x=Date_New, y=Max_Withdrawls_Total), color='yelow') +
+  labs(title = paste("2015 Max Withdrawls for", durham.2015.withdrawls$water.system.name, asheville.2015.withdrawls$water.system.name),
+       subtitle = paste("PSWID", durham.2015.withdrawls$PSWID, asheville.2015.withdrawls$PSWID),
+       y="Max Withdrawls",
+       x="Month")
+
+
+#after spending over 10 hours on this assignment, reviewing lessons, lab notes, and slack I was unable to finish. I kept running into more and more errors with the function reading both the durham and asheville sites. Unfortunately I cannot spend any more time on this assignment and need to move on to other classwork. 
 
 
 ```
