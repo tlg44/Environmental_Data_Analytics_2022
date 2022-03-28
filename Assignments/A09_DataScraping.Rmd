@@ -223,10 +223,13 @@ view(asheville.2015.withdrawls)
 #plot
 ggplot(asheville.2015.withdrawls) +
   geom_point(aes(x=Date,y=Max_Withdrawls_Total)) +
-  labs(title = paste("2020 Max Withdrawls for", water.system.name),
+  labs(title = paste("2015 Max Withdrawls for", water.system.name),
        subtitle = paste("PSWID", durham.2015.withdrawls$PSWID),
        y="Max Withdrawls",
        x="Month")
+
+#after spending over 10 hours on this assignment, reviewing lessons, lab and slack I was unable to finish. I kept running into more and more errors with the function reading other sites. Unfortunately I cannot spend any more time on this assignment. 
+
 
 ```
 
@@ -238,7 +241,7 @@ ggplot(asheville.2015.withdrawls) +
 any_year = seq(2010,2020)
 pswid = '01-11-010'
 
-
+#plot
 ggplot(durham.2015.withdrawls) +
   geom_point(aes(x=max.withdrawls.month.new,y=max.withdrawals.mgd.new)) +
   labs(title = paste("2020 Max Withdrawls for", water.system.name.new),
