@@ -1,6 +1,7 @@
 ---
 title: '11: Crafting Reports'
 author: Environmental Data Analytics | John Fay & Luana Lima | Developed by Kateri Salk
+student: Tasha Griffiths
 date: "Spring 2022"
 output:
  pdf_document: default
@@ -64,6 +65,10 @@ See: <https://rmarkdown.rstudio.com> and class recording.
 ## WHY R MARKDOWN?
 
 <Fill in our discussion below with bullet points. Use italics and bold for emphasis (hint: use the cheat sheets or `Help` →`Markdown Quick Reference` to figure out how to make bold and italic text).> 
+
+R markdown creates organized and clean PDF exports
+It can also allow for just the outputs you want and not run all the code
+
 
 
 ## TEXT EDITING CHALLENGE
