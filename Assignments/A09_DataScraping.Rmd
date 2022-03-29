@@ -139,7 +139,7 @@ the_df <- data.frame(
 )
 
 
-#5 Plot couldn't get a line to work? maybe bar chart better?
+#5 Plot couldn't get a line to work so used points
 ggplot(the_df,aes(x=max.withdrawls.month,y=max.withdrawals.mgd)) + 
   geom_point() +
   labs(title = paste("2020 Max Withdrawls for", water.system.name),
@@ -220,6 +220,10 @@ ggplot(durham.2015.withdrawls) +
 asheville.2015.withdrawls <- Withdrawls.scrape.function('2015','01-11-010')
 view(asheville.2015.withdrawls)
 
+#won't pull for asheville. Getting a error 
+#Error in data.frame(`Water System Name` = web.system.name, PSWID = web.pswid, : 
+#arguments imply differing number of rows: 1, 12, 0
+
 #plot
 ggplot(asheville.2015.withdrawls) +
   geom_point(aes(x=Date,y=Max_Withdrawls_Total)) +
@@ -237,7 +241,7 @@ geom_line(data=asheville.2015.withdrawls, aes(x=Date_New, y=Max_Withdrawls_Total
        x="Month")
 
 
-#after spending over 10 hours on this assignment, reviewing lessons, lab notes, and slack I was unable to finish. I kept running into more and more errors with the function reading both the durham and asheville sites. Unfortunately I cannot spend any more time on this assignment and need to move on to other classwork. 
+#after spending over 12 hours on this assignment, re-reviewing lessons, lab notes, and slack I was unable to finish. I kept running into more and more errors with the function reading both the durham and asheville sites. Unfortunately I cannot spend any more time on this assignment and need to move on to other classwork. 
 
 
 ```
