@@ -40,7 +40,7 @@ server <- function(input, output) {
           theme_classic(base_size = 14) +
           scale_shape_manual(values = c(21, 24)) +
           labs(x = "Date", y = expression(Concentration ~ (mu*g / L)), shape = "Lake", fill = "Depth ID") +
-          scale_fill_distiller(palette = "YlOrBr", guide = "colorbar", direction = 1)
+          scale_fill_distiller(palette = "rainbow", guide = "colorbar", direction = 1)
           #scale_fill_viridis_c(option = "viridis", begin = 0, end = 0.8, direction = -1)
       })
        
