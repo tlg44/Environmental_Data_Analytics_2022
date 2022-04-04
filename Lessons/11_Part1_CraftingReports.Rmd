@@ -98,7 +98,7 @@ NTL-LTER_Lake_ChemistryPhysics_Raw.csv | ata from studies on several lakes in th
 Create an R chunk below that installs the package `knitr`. Instead of commenting out the code, customize the chunk options such that the code is not evaluated (i.e., not run).
 
 
-```{r, eval = FALSE, installing.a.package}
+```{r, installing.a.package, eval = FALSE}
 #installing a package
 install.packages(knitr)
 library(knitr)
@@ -114,8 +114,8 @@ Load the NTL-LTER_Lake_Nutrients_Raw dataset, display the head of the dataset, a
 
 Customize the chunk options such that the code is run but is not displayed in the final document.
 
-```{r include = FALSE}
-
+```{r setup}
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
 #1. check directory
 getwd()
 
@@ -125,27 +125,27 @@ library(tidyverse)
 library(lubridate)
 library(knitr)
 
-#3 load dataset
-NTL_LTER <- read.csv("../Data/Raw/NTL-LTER_Lake_Nutrients_Raw.csv",
-                     stringsAsFactors = TRUE)
-
-#display head -- Need to put this error in the slack
-head(NTL_LTER)
-
-# Set date to date format
-NTL_LTER$sampledate <- as.Date(NTL_LTER$sampledate, format = "%m/%d/%y")
-class(NTL_LTER$sampledate)
-
-#4 Set theme
+#3 Set theme
 mytheme <- theme_classic(base_size = 14) +
   theme(axis.text = element_text(color = "black"), 
         legend.position = "top")
 theme_set(mytheme)
 
 
-
 ```
 
+```{r load.data, include = FALSE}
+#3 load dataset
+NTL_LTER <- read.csv("../Data/Raw/NTL-LTER_Lake_Nutrients_Raw.csv",
+                     stringsAsFactors = TRUE)
+
+#display head -- put this error in the slack was unable to resolve
+head(NTL_LTER)
+
+# Set date to date format
+NTL_LTER$sampledate <- as.Date(NTL_LTER$sampledate, format = "%m/%d/%y")
+class(NTL_LTER$sampledate)
+```
 
 
 ### Data Exploration, Wrangling, and Visualization
@@ -156,28 +156,96 @@ Create an R chunk below to create a processed dataset do the following operation
 -   Include only surface samples (depth = 0 m)
 -   Drop rows with missing data
 
+```{r data.wrangling}
+
+#filter the dataset
+NTL_LTER_Clean <- NTL_LTER %>%
+  select(lakename:sampledate,depth:po4) %>%
+  filter(depth == 0) %>%
+  filter(!is.na(tn_ug) & !is.na(tp_ug) & !is.na(nh34) & !is.na(no23) & !is.na(po4))
+
+```
+
+
 Create a second R chunk to create a summary dataset with the mean, minimum, maximum, and standard deviation of total nitrogen concentrations for each lake. Create a second summary dataset that is identical except that it evaluates total phosphorus. Customize the chunk options such that the code is run but not displayed in the final document.
 
-Create a third R chunk that uses the function `kable` in the knitr package to display two tables: one for the summary dataframe for total N and one for the summary dataframe of total P. Use the `caption = " "` code within that function to title your tables. Customize the chunk options such that the final table is displayed but not the code used to generate the table.
+```{r data.stats, include = FALSE}
 
-Create a fourth and fifth R chunk that generates two plots (one in each chunk): one for total N over time with different colors for each lake, and one with the same setup but for total P. Decide which geom option will be appropriate for your purpose, and select a color palette that is visually pleasing and accessible. Customize the chunk options such that the final figures are displayed but not the code used to generate the figures. In addition, customize the chunk options such that the figures are aligned on the left side of the page. Lastly, add a fig.cap chunk option to add a caption (title) to your plot that will display underneath the figure.
+#Nitrogen stats data
+NitrogenStats <- NTL_LTER_Clean %>%
+  group_by(lakename) %>%
+  summarise(Mean_N = mean(tn_ug),
+            Min_N = min(tn_ug),
+            Max_N = max(tn_ug),
+            StDev_N = sd(tn_ug))
 
-```{r}
-#Data Wrangling
-
-NTL_LTER_Clean <- NTL.LTER %>%
-  select(lakename:sampledate, depth:po4) %>%
-  filter(depth %in% c(0)) %>%
-  drop_na()
+#Phosphorous stats data
+PhosphorousStats <- NTL_LTER_Clean %>%
+  group_by(lakename) %>%
+  summarise(Mean_P = mean(tp_ug),
+            Min_P = min(tp_ug),
+            Max_P = max(tp_ug),
+            StDev_P = sd(tp_ug))
 
 
 ```
 
 
+Create a third R chunk that uses the function `kable` in the knitr package to display two tables: one for the summary dataframe for total N and one for the summary dataframe of total P. Use the `caption = " "` code within that function to title your tables. Customize the chunk options such that the final table is displayed but not the code used to generate the table.
+
+```{r summary.stats, echo = FALSE}
+#Nitrogen info
+NitrogenSummary <- kable(NitrogenStats, format="html", 
+                        caption="Total Nitrogen Summary")
+
+#phosphorous info
+PhosphorousSummary <- kable(PhosphorousStats, format="html", 
+                           caption="Total Phosphorous Summary")
+#view tables
+print(NitrogenSummary)
+print(PhosphorousSummary)
+
+```
+
+
+
+Create a fourth and fifth R chunk that generates two plots (one in each chunk): one for total N over time with different colors for each lake, and one with the same setup but for total P. Decide which geom option will be appropriate for your purpose, and select a color palette that is visually pleasing and accessible. Customize the chunk options such that the final figures are displayed but not the code used to generate the figures. In addition, customize the chunk options such that the figures are aligned on the left side of the page. Lastly, add a fig.cap chunk option to add a caption (title) to your plot that will display underneath the figure.
+
+```{r Nitrogen.plot, echo = FALSE}
+#Nitrogen over time
+NitrogenTime <- ggplot(NTL_LTER_Clean, aes(x = sampledate, y = tn_ug, 
+                                           color = lakename)) +
+  geom_point(alpha = 0.3) +
+  labs(y="Total Nitrogen ug",x="Years",color="Lake", 
+       title = "Total Nitrogen over time")
+print(NitrogenTime)
+
+```
+
+```{r Phosphorous.plot, echo = FALSE}
+#Phosphorous over time
+PhosphorousTime <- ggplot(NTL_LTER_Clean, aes(x = sampledate, y = tp_ug, 
+                                              color = lakename)) +
+  geom_point(alpha = 0.3) + 
+  labs(y ="Total Phosphorous ug",x ="Years",color = "Lake", 
+       title = "Total Phosphorous over time")
+print(PhosphorousTime)
+
+```
+
 
 ### Communicating results
 
 Write a paragraph describing your findings from the R coding challenge above. This should be geared toward an educated audience but one that is not necessarily familiar with the dataset. Then insert a horizontal rule below the paragraph. Below the horizontal rule, write another paragraph describing the next steps you might take in analyzing this dataset. What questions might you be able to answer, and what analyses would you conduct to answer those questions?
+
+### Summary Paragraph
+
+Levels of total Phosphorous and total Nitrogen have changed over time the 8 monitored lakes in Michigan. Phosphorous and Nitrogen are frequently elevated in lake samples due to farmland runoff. However it looks like both chemicals were unver 50 ug in all lakes until about 1996. After 1996 the levels of both chemicals dramatically increased in East Long Lake and Peter and Paul Lakes. 
+
+*************************
+### Next Steps for further Analyses
+
+It is interesting that the levels of both Phosphorous and Nitrogen changed dramatically between 1995-1997. In order to understand why - it would be interesting to compare how close each lake is to a neighboring farmland or is close downstream from any chemical processing plants that were built around that time period. Another avenue for analysis would be if any new policies limiting types of fertilizers was removed around that time in the area of these lakes. 
 
 
 ## KNIT YOUR PDF
