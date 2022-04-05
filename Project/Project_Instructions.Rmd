@@ -6,7 +6,7 @@ output: pdf_document
 geometry: margin=2.54cm
 ---
 
-## CREATE A REPOSITORY IN YOUR GITHUB ACCOUNT 
+## CREATE A REPOSITORY IN YOUR GITHUB ACCOUNT (Izzy)
 
 1. Go to your user account on GitHub an navigate to the repositories tab. 
 
